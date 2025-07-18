@@ -30,7 +30,7 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 
 > **Legend**: “SLM” refers to small‑LLM finetuning on **LLaMA 3.2 3B**.
 > 
-> **Experiment details:** Link to experiments: https://docs.google.com/spreadsheets/d/1Vg8xPi4Ag4sMt__vSpLLViC2TWu9cTrJPGHCB1mrzDc/edit?usp=sharing
+> **Link to experiments:** https://docs.google.com/spreadsheets/d/1Vg8xPi4Ag4sMt__vSpLLViC2TWu9cTrJPGHCB1mrzDc/edit?usp=sharing
 ---
 
 ## 4. Experiments Overview
