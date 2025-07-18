@@ -8,21 +8,15 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 
 ## 2. Experiments Conducted
 
-### ❌ ML Indentation/Spacing Robustness
+###  Dynamic values & length of input/output
+- **Setup**: Single format dataset with small-medium length examples trained (500 examples).
+
+###  Indentation/Spacing Deviation Handling
 - **Setup**: Single format dataset with imperfect spacing (500 examples).
-- **Result**: `39%` exact-match accuracy under formatting variation.
 
-### ❌ ML Format Conversion Trials
+###  Format Understanding Ability
 - **Setup**: Three experiments using two training formats (1,000 examples each).
-- **Test**: Unseen composite format.
-- **Result**: `0.0%` exact-match accuracy on the held‑out format in all runs.
-
-### ✅ SLM Evaluation (Preliminary)
-- Full-scale test-dataset evaluation pending.
-- On a small test set:
-  - Shows **consistent generalization** for:
-    - Value and length variations
-    - Nested formatting structures
+- **Test Set**: Unseen composite format.
 
 ---
 
@@ -30,9 +24,9 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 
 | Task                        | Training Examples         | ML Outcome | SLM Outcome | ML Notes                                     | SLM Notes                                          |
 |----------------------------|---------------------------|------------|-------------|----------------------------------------------|----------------------------------------------------|
-| Value & Length (short)     | 500–750                   | ❌ Fail     | ✅ Pass      | ❌ Fails on long lists when only short-trained | ✅ Generalizes to larger entries with different values |
+| Changing value & length    | 500–750                   | ❌ Fail     | ✅ Pass      | ⚠️ Fails on long lists when only short-trained. Need trained examples of long lists. | ✅ Generalizes to larger entries with different values |
 | Value & Length (long)      | 1,000–2,000               | ✅ Pass     | ✅ Pass      | ✅ Trained on longer inputs                   | ✅ Generalizes to larger entries with different values |
-| Format Conversion (nested) | ML: 15,000+ / SLM: 500–1,000 | ❌ Fail     | ✅ Pass      | ❌ Requires ≥ 15,000 varied examples          | ✅ Needs 500–1,000 examples per format for refinement |
+| Format Conversion (nested) | ML: 15,000+ / SLM: 500–1,000 | ❌ Fail     | 🟡 Pass      | ❌ Requires ≥ 15,000 varied examples          | ✅ Needs 500–1,000 examples per format for refinement |
 
 > **Legend**: “SLM” refers to small‑LLM finetuning on **LLaMA 3.2 3B**.
 > Link to experiments: https://docs.google.com/spreadsheets/d/1Vg8xPi4Ag4sMt__vSpLLViC2TWu9cTrJPGHCB1mrzDc/edit?usp=sharing
