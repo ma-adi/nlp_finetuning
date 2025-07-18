@@ -27,7 +27,7 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 |----------------------------|---------------------------|------------|-------------|----------------------------------------------|----------------------------------------------------|
 | Changing value & length    | 500–750                   | ⚠️ Dataset dependent     | ✅ Pass      | ⚠️ Fails on long lists when only short-trained. Need trained examples of long lists. | ✅ Generalizes to larger entries with different values |
 | Indentation variation single format      | 500-750               | ✅ Pass     | ✅ Pass      | ✅ Passes on initial testing of changing \n and spaces                   | ✅ Passes on initial testing of changing \n and spaces |
-| Format Understanding (NestedList) | ML: 15,000+ / SLM: 500–1,000 | ❌ Fail     | 🟡 Promising      | ❌ Requires ≥ 20,000 varied examples (estimate) for truly understanding the format rules          | ✅ Needs 500–1,000 examples per format for refinement |
+| Format Understanding (NestedList) | ML: 15,000+ / SLM: 500–1,000 | ❌ Fail     | 🟡 Promising      | ❌ Requires ≥ 20,000 varied examples (estimate) for truly understanding the format rules          | ✅ Needs smaller set of examples per format; finetuning technique refinement |
 
 > **Legend**: “SLM” refers to small‑LLM finetuning on **LLaMA 3.2 3B**.
 > 
