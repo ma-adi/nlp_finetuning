@@ -24,7 +24,7 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 
 | Task                        | Training Examples         | ML Outcome | SLM Outcome | ML Notes                                     | SLM Notes                                          |
 |----------------------------|---------------------------|------------|-------------|----------------------------------------------|----------------------------------------------------|
-| Changing value & length    | 500–750                   | ❌ Fail     | ✅ Pass      | ⚠️ Fails on long lists when only short-trained. Need trained examples of long lists. | ✅ Generalizes to larger entries with different values |
+| Changing value & length    | 500–750                   | ⚠️ Dataset dependent     | ✅ Pass      | ⚠️ Fails on long lists when only short-trained. Need trained examples of long lists. | ✅ Generalizes to larger entries with different values |
 | Indentation variation single format      | 500-750               | 🟡 Promising     | ✅ Pass      | ✅ Showing promising results                   | ✅ Generalizes to indentation deviation well |
 | Format Conversion (nested) | ML: 15,000+ / SLM: 500–1,000 | ❌ Fail     | 🟡 Promising      | ❌ Requires ≥ 15,000 varied examples          | ✅ Needs 500–1,000 examples per format for refinement |
 
