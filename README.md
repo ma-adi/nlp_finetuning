@@ -16,7 +16,8 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 
 ###  Format Understanding Ability
 - **Setup**: Three experiments using two training formats (1,000 examples each).
-- **Test Set**: Unseen composite format.
+- **Test Set**: Unseen composite format. (combination of concepts from format1 and format2)
+- This tests whether the model has 'learnt' rules of format conversion.
 
 ---
 
@@ -26,7 +27,7 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 |----------------------------|---------------------------|------------|-------------|----------------------------------------------|----------------------------------------------------|
 | Changing value & length    | 500–750                   | ⚠️ Dataset dependent     | ✅ Pass      | ⚠️ Fails on long lists when only short-trained. Need trained examples of long lists. | ✅ Generalizes to larger entries with different values |
 | Indentation variation single format      | 500-750               | ✅ Pass     | ✅ Pass      | ✅ Passes on initial testing of changing \n and spaces                   | ✅ Passes on initial testing of changing \n and spaces |
-| Format Understanding (NestedList) | ML: 15,000+ / SLM: 500–1,000 | ❌ Fail     | 🟡 Promising      | ❌ Requires ≥ 15,000 varied examples (estimate)          | ✅ Needs 500–1,000 examples per format for refinement |
+| Format Understanding (NestedList) | ML: 15,000+ / SLM: 500–1,000 | ❌ Fail     | 🟡 Promising      | ❌ Requires ≥ 20,000 varied examples (estimate) for truly understanding the format rules          | ✅ Needs 500–1,000 examples per format for refinement |
 
 > **Legend**: “SLM” refers to small‑LLM finetuning on **LLaMA 3.2 3B**.
 > 
