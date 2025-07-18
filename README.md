@@ -29,7 +29,7 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 | Format Conversion (nested) | ML: 15,000+ / SLM: 500–1,000 | ❌ Fail     | 🟡 Promising      | ❌ Requires ≥ 15,000 varied examples          | ✅ Needs 500–1,000 examples per format for refinement |
 
 > **Legend**: “SLM” refers to small‑LLM finetuning on **LLaMA 3.2 3B**.
-> Link to experiments: https://docs.google.com/spreadsheets/d/1Vg8xPi4Ag4sMt__vSpLLViC2TWu9cTrJPGHCB1mrzDc/edit?usp=sharing
+> **Experiment details:** Link to experiments: https://docs.google.com/spreadsheets/d/1Vg8xPi4Ag4sMt__vSpLLViC2TWu9cTrJPGHCB1mrzDc/edit?usp=sharing
 ---
 
 ## 4. Experiments Overview
