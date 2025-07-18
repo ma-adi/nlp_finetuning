@@ -47,8 +47,7 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 
 > **Legend:** “SLM” refers to small‑LLM finetuning on Llama 3.2 3B.
 
-## 4. Performance & Cost Comparison. Performance & Cost Comparison. Performance & Cost Comparison Performance & Cost Comparison. Performance & Cost Comparison Performance & Cost Comparison
-
+## 4. Performance & Cost Comparison.
 | Metric            | CodeT5+ 220M                                                                                                                                 | Llama 3.2 3B (GGUF)                                                                                                                                   |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Params            | 220 million                                                                                                                                  | 3 billion                                                                                                                                             |
