@@ -1,2 +1,5 @@
 fine_tuned_models/
 format_conversion*
+utils/input_dataset_v1.5_long_format_id_metadata.json
+utils/*.json
+llama_ft_*
