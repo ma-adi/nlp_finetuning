@@ -2,7 +2,7 @@ from model_setup_new import NLPCoder
 
 def train_and_check(dataset_path: str, model_save_dir: str, threshold: float = 0.8, 
                     model_name: str = "Salesforce/codet5p-770m", model_base_dir = None, train_epochs=4, batch_size=1,
-                    heldout_format_ids = None) -> bool:
+                    heldout_format_ids = None, unseen_hint_proportion: float = 0.0) -> bool:
     """
     Wrapper that fine-tunes and evaluates the model. Returns True if exact_match < threshold.
     """
@@ -12,7 +12,8 @@ def train_and_check(dataset_path: str, model_save_dir: str, threshold: float = 0
                      dataset_path=dataset_path,
                      output_dir=model_save_dir,
                      load_fine_tuned=False,
-                     holdout_format_ids=heldout_format_ids)
+                     holdout_format_ids=heldout_format_ids,
+                     unseen_hint_proportion=unseen_hint_proportion)
 
     results = coder.fine_tune(train_epochs = train_epochs, batch_size = batch_size)
 
@@ -29,4 +30,5 @@ if __name__ == "__main__":
                     train_epochs=6,
                     batch_size=1,
                     threshold=0.9,
-                    heldout_format_ids=['ListOfComplexEntities'])
+                    heldout_format_ids=['ListOfComplexEntities'],
+                    unseen_hint_proportion = 0.0)
