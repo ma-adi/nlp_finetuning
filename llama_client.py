@@ -144,17 +144,10 @@ if __name__ == "__main__":
   <employee>
     <fullName>David Kim</fullName>
   </employee>
-  <employee>
-    <fullName>Alicia Reed</fullName>
-  </employee>
-  <employee>
-    <fullName>Tommy Blake</fullName>
-  </employee>
-  <employee>
-    <fullName>Monica Allen</fullName>
-  </employee>
 </employeeList>
 '''
+
+    input_xml = 'Hi'
     # '''
     # <6a1017b2>
     # <abc>
