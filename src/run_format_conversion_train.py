@@ -1,7 +1,7 @@
 from model_setup_new import NLPCoder
 
 def train_and_check(dataset_path: str, model_save_dir: str, threshold: float = 0.8, 
-                    model_name: str = "Salesforce/codet5-base", model_base_dir = None, train_epochs=4, batch_size=1,
+                    model_name: str = "Salesforce/codet5p-770m", model_base_dir = None, train_epochs=4, batch_size=1,
                     heldout_format_ids = None) -> bool:
     """
     Wrapper that fine-tunes and evaluates the model. Returns True if exact_match < threshold.
