@@ -8,14 +8,14 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 
 ## 2. Experiments Conducted
 
+### ❌ ML Indentation/Spacing Robustness
+- **Setup**: Single format dataset with imperfect spacing (500 examples).
+- **Result**: `39%` exact-match accuracy under formatting variation.
+
 ### ❌ ML Format Conversion Trials
 - **Setup**: Three experiments using two training formats (1,000 examples each).
 - **Test**: Unseen composite format.
 - **Result**: `0.0%` exact-match accuracy on the held‑out format in all runs.
-
-### ❌ ML Indentation/Spacing Robustness
-- **Setup**: Single format dataset with imperfect spacing (500 examples).
-- **Result**: `39%` exact-match accuracy under formatting variation.
 
 ### ✅ SLM Evaluation (Preliminary)
 - Full-scale test-dataset evaluation pending.
