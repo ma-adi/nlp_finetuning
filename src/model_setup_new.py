@@ -373,6 +373,37 @@ class NLPCoder:
             )
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
+    def infer_batch(self, input_texts: List[str], 
+                    max_length: int = 1024,
+                    num_beams: int = 5) -> List[str]:
+        """
+        Performs generation on a batch of input strings.
+        """
+        # tokenize all inputs at once (padding to the longest in the batch)
+        encodings = self.tokenizer(
+            input_texts,
+            return_tensors='pt',
+            padding=True,
+            truncation=True,
+            max_length=max_length
+        ).to(self.model.device)
+
+        with torch.no_grad():
+            batch_outputs = self.model.generate(
+                encodings['input_ids'],
+                attention_mask=encodings['attention_mask'],
+                max_new_tokens=max_length,
+                num_beams=num_beams,
+                early_stopping=False
+            )
+
+        # decode each sample in the batch
+        return [
+            self.tokenizer.decode(t, skip_special_tokens=True)
+            for t in batch_outputs
+        ]
+
+
     def evaluate(self, tok_test_ds: Dataset):
         self.model.eval()
         args = Seq2SeqTrainingArguments(
