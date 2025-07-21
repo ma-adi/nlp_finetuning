@@ -147,28 +147,28 @@ if __name__ == "__main__":
 </employeeList>
 '''
 
-    input_xml = 'Hi'
-    # '''
-    # <6a1017b2>
-    # <abc>
-    #     <f9beb562>prevent</f9beb562>
-    #     <f9beb562>lot</f9beb562>
-    #     <f9beb562>at</f9beb562>
-    #     <f9beb562>bring</f9beb562>
-    # </abc>
-    # <def>
-    #     <list_cat2>think</list_cat2>
-    #     <list_cat2>west</list_cat2>
-    #     <list_cat2>money</list_cat2>
-    # </def>
-    # <ghi>
-    #     <list_cat3>picture</list_cat3>
-    #     <list_cat3>north</list_cat3>
-    #     <list_cat3>admit</list_cat3>
-    #     <list_cat3>project</list_cat3>
-    # </ghi>
-    # </6a1017b2>
-    # '''
+    input_xml = \
+    '''
+    <6a1017b2>
+    <abc>
+        <tag1>prevent</tag1>
+        <tag1>lot</tag1>
+        <tag1>at</tag1>
+        <tag1>bring</tag1>
+    </abc>
+    <abc>
+        <tag2>think</tag2>
+        <tag2>west</tag2>
+        <tag2>money</tag2>
+    </abc>
+    <abc>
+        <tag3>picture</tag3>
+        <tag3>north</tag3>
+        <tag3>admit</tag3>
+        <tag3>project</tag3>
+    </abc>
+    </6a1017b2>
+    '''
 
     user_prompt = to_instruct_inference(context= context_message, question = input_xml)
 
