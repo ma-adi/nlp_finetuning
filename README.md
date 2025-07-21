@@ -139,7 +139,7 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 }
 ```
 ---
-### 4.2 Simple Format Conversion
+### 4.3 Deep Format Conversion
 
 **Objective**: Train on two simple formats and test on a nested variant (held-out).
 
