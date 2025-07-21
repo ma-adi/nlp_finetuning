@@ -4,3 +4,5 @@ torch
 accelerate
 evaluate 
 scikit-learn
+flask
+tiktoken
