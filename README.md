@@ -60,38 +60,169 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 ```
 
 ---
-
-### 4.2 Format Conversion
+### 4.2 Simple Format Conversion
 
 **Objective**: Train on two simple formats and test on a nested variant (held-out).
 
 **Format 1 (Flat List)**:
 ```xml
-<root><value>foo</value>...</root>
+<outer>
+  <lvals>word1</lvals>
+  <lvals>word2</lvals>
+  <lvals>word3</lvals>
+</outer>
 ```
 ➡️  
 ```json
-{"root":{"value": [...]} }
+{
+  "outer": {
+    "lvals": [
+      "word1",
+      "word2",
+      "word3"
+    ]
+  }
+}
 ```
 
 **Format 2 (List of Objects)**:
 ```xml
-<root><item><name>bar</name></item>...</root>
+<container>
+  <item>
+    <name>Laptop</name>
+  </item>
+  <item>
+    <name>Mouse</name>
+  </item>
+</container>
 ```
 ➡️  
 ```json
-{"root":{"item":[{"name":"bar"},...]} }
+{
+  "container": {
+    "item": [
+      {
+        "name": "Laptop"
+      },
+      {
+        "name": "Mouse"
+      }
+    ]
+  }
+}
 ```
 
 **Held-out Test Format (Nested List)**:
 ```xml
-<root><item><sub>a</sub><sub>b</sub></item></root>
+<root>
+  <entity>
+   <name>Karthee</name>
+   <name>Gautaman</name>
+   <name>Adithya</name>
+   <name>Dom</name>
+  </entity>
+</root>
 ```
 ➡️  
 ```json
-{"root":{"item":[{"sub":["a","b"]}]}}
+{
+  "root": {
+    "entity": {
+      "name": [
+        "Karthee",
+        "Gautaman",
+        "Adithya",
+        "Dom"
+      ]
+    }
+  }
+}
+```
+---
+### 4.2 Simple Format Conversion
+
+**Objective**: Train on two simple formats and test on a nested variant (held-out).
+
+**Format 1 (Flat List)**:
+```xml
+<outer>
+  <lvals>word1</lvals>
+  <lvals>word2</lvals>
+  <lvals>word3</lvals>
+</outer>
+```
+➡️  
+```json
+{
+  "outer": {
+    "lvals": [
+      "word1",
+      "word2",
+      "word3"
+    ]
+  }
+}
 ```
 
+**Format 2 (List of Objects)**:
+```xml
+<container>
+  <item>
+    <name>Laptop</name>
+  </item>
+  <item>
+    <name>Mouse</name>
+  </item>
+</container>
+```
+➡️  
+```json
+{
+  "container": {
+    "item": [
+      {
+        "name": "Laptop"
+      },
+      {
+        "name": "Mouse"
+      }
+    ]
+  }
+}
+```
+
+**Held-out Test Format (Nested List)**:
+```xml
+<wrapper>
+  <element>
+    <value>red</value>
+    <value>green</value>
+  </element>
+  <element>
+    <value>blue</value>
+  </element>
+</wrapper>
+```
+➡️  
+```json
+{
+  "wrapper": {
+    "element": [
+      {
+        "value": [
+          "red",
+          "green"
+        ]
+      },
+      {
+        "value": [
+          "blue"
+        ]
+      }
+    ]
+  }
+}
+```
 ---
 
 ## 5. Performance & Cost Comparison
