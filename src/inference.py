@@ -49,6 +49,22 @@ if __name__ == "__main__":
 </keyword_list>
 '''
 
+
+    input_text = \
+'''
+<root>
+  <entity>
+   <name>Karthee</name>
+  </entity>
+  <entity>
+   <name>Magic</name>
+  </entity>
+  <entity>
+   <name>Gautaman</name>
+  </entity>
+</root>
+'''
+
 #     input_text = \
 # '''
 # <root>
