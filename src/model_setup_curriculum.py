@@ -7,9 +7,10 @@ from transformers import Seq2SeqTrainingArguments, Seq2SeqTrainer
 from sklearn.model_selection import train_test_split
 import evaluate
 import numpy as np  # Ensure at top
-from collections import Counter
 from collections import Counter, defaultdict
 from itertools import combinations
+import re
+import os
 
 exact_match = evaluate.load("exact_match")
 
@@ -68,9 +69,12 @@ class NLPCoder:
         test_size: float = 0.2,
         random_state: int = 42,
         n_complexity_bins: int = 3,
+        α = 0.5,
+        β = 0.5   # you can expose these as hyperparams
     ) -> tuple[list, list]:
         
         print("--- Starting Data Preparation and Splitting ---")
+
 
         # 1. Load and Pre-process Data
         with open(raw_dataset_path, 'r', encoding='utf-8') as f:
@@ -99,6 +103,20 @@ class NLPCoder:
         
         # --- NEW: Check for `format_id` and choose splitting strategy ---
         has_format_id = 'format_id' in all_examples[0]
+
+
+        for ex in all_examples:
+            ex["num_tags"] = len(ex.get("tags", []))
+
+        # find maximum number of tags in any example
+        max_num_tags = max(ex["num_tags"] for ex in all_examples) or 1
+
+        # composite difficulty: alpha * (complexity) + beta * (num_tags)
+        for ex in all_examples:
+            den = max(n_complexity_bins - 1, 1)
+            norm_complex = ex["complexity"] / den
+            norm_tags    = ex["num_tags"]     / max_num_tags
+            ex["difficulty"] = α * norm_complex + β * norm_tags
 
         if has_format_id:
             # --- PATH A: Original logic for format_id-based holdout splitting ---
@@ -309,60 +327,239 @@ class NLPCoder:
         inputs['labels'] = labels_ids
         return inputs
 
-    def fine_tune(self, train_epochs: int, batch_size: int):
+    # def fine_tune(self, train_epochs: int, batch_size: int):
+    def fine_tune(
+        self,
+        train_epochs: int,
+        batch_size: int,
+        curriculum_phases: int = 3,
+        α: float = 0.5,
+        β: float = 0.5,
+       weighted_epochs: bool = True,
+       epoch_weights: Optional[List[float]] = None,
+    ):
         torch.manual_seed(42)
         np.random.seed(42)
 
-        train_ds, eval_ds = self._load_and_prepare_data()
-        tok_train = train_ds.map(
-            self._tokenize_function, batched=True,
-            remove_columns=train_ds.column_names
+        # train_ds, eval_ds = self._load_and_prepare_data()
+        # load _un_tokenized_ train list so we can re-subset on difficulty
+        train_data, test_data = self._load_and_split_raw_data(self.dataset_path, α=α, β=β)
+        train_ds = Dataset.from_list(train_data)
+        test_ds  = Dataset.from_list(test_data)
+        def _preprocess_fn(examples):
+            return {"input_text": examples["question"], "target_text": examples["answer"]}
+
+        # wrap lists into Datasets
+        train_ds = Dataset.from_list(train_data)
+        test_ds  = Dataset.from_list(test_data)
+
+        # 1) wrap raw python lists into 🤗 Datasets
+        train_ds = Dataset.from_list(train_data)
+        test_ds  = Dataset.from_list(test_data)
+
+        # 2) add the columns your tokenizer‐fn expects
+        def _add_text_cols(examples):
+            return {
+                "input_text":  examples["question"],
+                "target_text": examples["answer"],
+            }
+
+        train_ds = train_ds.map(_add_text_cols, batched=True)
+        test_ds  = test_ds.map(_add_text_cols, batched=True)
+
+        # 3) now you can safely tokenize & drop all orig columns
+        drop_cols = [
+            "question","answer","format_id",
+            "tags","complexity","num_tags","difficulty"
+        ]
+        tok_eval = test_ds.map(
+            self._tokenize_function,
+            batched=True,
+            remove_columns=drop_cols + ["input_text","target_text"],
         )
-        tok_eval = eval_ds.map(
+
+
+
+        tok_eval = test_ds.map(
             self._tokenize_function, batched=True,
-            remove_columns=eval_ds.column_names
+            remove_columns=test_ds.column_names
         )
 
         data_collator = DataCollatorForSeq2Seq(
             tokenizer=self.tokenizer, model=self.model
         )
 
+        # epochs_per_phase = max(1, train_epochs // curriculum_phases)
+
+
         args = Seq2SeqTrainingArguments(
             output_dir=self.output_dir,
-            num_train_epochs=train_epochs,
             per_device_train_batch_size=batch_size,
-            per_device_eval_batch_size=batch_size,
-            eval_strategy='epoch',          # Keep evaluating every epoch
-            save_strategy='epoch',          # Keep saving every epoch
-            logging_dir='./logs', logging_steps=50,
-            load_best_model_at_end=True,    # This is key!
-            report_to='none',
-            
-            # --- THE CRITICAL CHANGES ---
-            predict_with_generate=False,    # <<<<<<< 1. DO NOT generate during training evaluations
-            metric_for_best_model='loss',   # <<<<<<< 2. Use eval loss to find the best model
-            greater_is_better=False,        # <<<<<<< 3. For loss, lower is better
-            # ----------------------------
-
-            save_total_limit=1
+            eval_strategy="no",    # no eval during sub‑phases
+            save_strategy="epoch",
+            logging_dir="./logs",
+            logging_steps=50,
+            load_best_model_at_end=False,
+            predict_with_generate=True,
+            generation_max_length=512,
+            generation_num_beams=5,
+            save_total_limit=1,
         )
+        # trainer.train()
+        # --- Curriculum: K phases of increasing max-difficulty τ_k ---
+        thresholds = [(i + 1) / curriculum_phases for i in range(curriculum_phases)]
 
-        trainer = Seq2SeqTrainer(
-            model=self.model,
-            args=args,
-            train_dataset=tok_train,
-            eval_dataset=tok_eval,
-            tokenizer=self.tokenizer,
-            data_collator=data_collator,
-            compute_metrics=lambda p: compute_metrics(p, self.tokenizer)
-        )
+        # 1) Equal‐split by default
+        if not weighted_epochs:
+            base = train_epochs // curriculum_phases
+            extra = train_epochs % curriculum_phases
+            # distribute the “leftover” 1’s in the first `extra` phases
+            epochs_per_phase = [
+                base + (1 if i < extra else 0)
+                for i in range(curriculum_phases)
+            ]
+        else:
+            # 2) Weighted at runtime: either user‑given or by slice size
+            if epoch_weights:
+                if len(epoch_weights) != curriculum_phases:
+                    raise ValueError("epoch_weights must have length == curriculum_phases")
+                # normalize to sum == train_epochs
+                total_w = sum(epoch_weights)
+                epochs_per_phase = [
+                    max(1, round(train_epochs * (w / total_w)))
+                    for w in epoch_weights
+                ]
+            else:
+                # auto‐compute weights by slice size
+                # slice_sizes = []
+                # for τ in thresholds:
+                #     count = sum(1 for ex in train_data if ex["difficulty"] <= τ)
+                #     slice_sizes.append(count)
 
-        trainer.train()
+                cum1 = 0
+                slice_sizes = []
+                for τ in thresholds:
+                    c = sum(1 for ex in train_data if ex["difficulty"] <= τ)
+                    slice_sizes.append(c - cum1)
+                    cum1 = c
+
+                total = sum(slice_sizes)
+                if total == 0:
+                    raise RuntimeError("No training examples found for any phase.")
+                epochs_per_phase = [
+                    max(1, round(train_epochs * (sz / total)))
+                    for sz in slice_sizes
+                ]
+        print(f"Epochs per phase: {epochs_per_phase}")
+
+
+        def _get_latest_checkpoint(checkpoint_dir: str) -> str:
+            checkpoints = [
+                d for d in os.listdir(checkpoint_dir)
+                if re.match(r"^checkpoint-\d+$", d)
+            ]
+            if not checkpoints:
+                raise ValueError(f"No checkpoints found in {checkpoint_dir}")
+
+            latest = max(checkpoints, key=lambda x: int(x.split("-")[-1]))
+            return os.path.join(checkpoint_dir, latest)
+
+
+
+
+        last_ckpt = None
+        # for phase, τ in enumerate(thresholds, start=1):
+        for phase, (τ, n_ep) in enumerate(zip(thresholds, epochs_per_phase), start=1):
+
+            # pick only those examples whose difficulty ≤ τ
+            subset = [ex for ex in train_data if ex["difficulty"] <= τ]
+            if not subset:
+                print(f"Skipping phase {phase}: no examples ≤ {τ:.2f}")
+                continue
+
+            print(f"[Phase {phase}/{curriculum_phases}] τ≤{τ:.2f}, "
+                  f"{len(subset)} examples → {n_ep} epochs")
+            # tok_phase = Dataset.from_list(subset).map(
+            #     self._tokenize_function,
+            #     batched=True,
+            #     remove_columns=train_ds.column_names
+            # )
+            # build a Dataset from this phase’s subset
+            subset_ds = Dataset.from_list(subset)
+            # add input_text & target_text
+            subset_ds = subset_ds.map(_add_text_cols, batched=True)
+            # tokenize & drop all original fields
+            tok_phase = subset_ds.map(
+                self._tokenize_function,
+                batched=True,
+                remove_columns=drop_cols + ["input_text","target_text"],
+            )
+
+            args.num_train_epochs = n_ep
+
+
+            if phase == curriculum_phases:
+                phase_args = Seq2SeqTrainingArguments(
+                    output_dir=args.output_dir,
+                    per_device_train_batch_size=args.per_device_train_batch_size,
+                    eval_strategy="epoch",  # ✅ enable eval for final phase
+                    per_device_eval_batch_size=batch_size,
+                    save_strategy=args.save_strategy,
+                    logging_dir=args.logging_dir,
+                    logging_steps=args.logging_steps,
+                    load_best_model_at_end=False,
+                    predict_with_generate=True,
+                    generation_max_length=args.generation_max_length,
+                    generation_num_beams=args.generation_num_beams,
+                    save_total_limit=args.save_total_limit,
+                    num_train_epochs=n_ep,
+                    report_to=args.report_to if hasattr(args, "report_to") else "none",
+                    metric_for_best_model='exact_match',
+                )
+                trainer = Seq2SeqTrainer(
+                    model=self.model,
+                    args=phase_args,
+                    train_dataset=tok_phase,
+                    eval_dataset=tok_eval,
+                    tokenizer=self.tokenizer,
+                    data_collator=data_collator,
+                    compute_metrics=lambda p: compute_metrics(p, self.tokenizer)
+                )
+            else:
+                # intermediate phase: no eval, no compute_metrics
+                trainer = Seq2SeqTrainer(
+                    model=self.model,
+                    args=args,
+                    train_dataset=tok_phase,
+                    tokenizer=self.tokenizer,
+                    data_collator=data_collator,
+                )
+
+            # trainer.train_dataset = tlok_phase
+            trainer.train(resume_from_checkpoint=last_ckpt)
+            # after each phase HuggingFace writes a new checkpoint in output_dir/
+            last_ckpt = _get_latest_checkpoint(self.output_dir)
+
         self.model.save_pretrained(self.output_dir)
         self.tokenizer.save_pretrained(self.output_dir)
 
-        # post-hoc evaluation
-        metrics = trainer.evaluate(eval_dataset=tok_eval)
+        eval_trainer = Seq2SeqTrainer(
+        model=self.model,
+        args=Seq2SeqTrainingArguments(
+            output_dir=self.output_dir,
+            predict_with_generate=True,
+            per_device_eval_batch_size=batch_size,
+            generation_num_beams=5,
+            generation_max_length=512,
+            report_to='none'
+        ),
+        tokenizer=self.tokenizer,
+        data_collator=data_collator,
+        compute_metrics=lambda p: compute_metrics(p, self.tokenizer)
+    )
+        metrics = eval_trainer.evaluate(eval_dataset=tok_eval)
+
+
         self.model.eval()
         return metrics
 
