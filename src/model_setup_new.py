@@ -354,7 +354,7 @@ class NLPCoder:
             eval_dataset=tok_eval,
             tokenizer=self.tokenizer,
             data_collator=data_collator,
-            compute_metrics=lambda p: compute_metrics(p, self.tokenizer)
+            # compute_metrics=lambda p: compute_metrics(p, self.tokenizer)
         )
 
         trainer.train()
@@ -362,7 +362,7 @@ class NLPCoder:
         self.tokenizer.save_pretrained(self.output_dir)
 
         # post-hoc evaluation
-        metrics = trainer.evaluate(eval_dataset=tok_eval)
+        metrics = self.evaluate(tok_test_ds=tok_eval)
         self.model.eval()
         return metrics
 

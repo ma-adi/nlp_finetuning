@@ -523,7 +523,7 @@ class NLPCoder:
                     eval_dataset=tok_eval,
                     tokenizer=self.tokenizer,
                     data_collator=data_collator,
-                    compute_metrics=lambda p: compute_metrics(p, self.tokenizer)
+                    # compute_metrics=lambda p: compute_metrics(p, self.tokenizer)
                 )
             else:
                 # intermediate phase: no eval, no compute_metrics
