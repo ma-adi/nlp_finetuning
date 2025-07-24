@@ -49,6 +49,24 @@ if __name__ == "__main__":
 #   <keyword>customer</keyword>
 #   <keyword>project</keyword>
 #   <keyword>team</keyword>
+#   <keyword>customer</keyword>
+#   <keyword>project</keyword>
+#   <keyword>team</keyword>
+#   <keyword>customer</keyword>
+#   <keyword>project</keyword>
+#   <keyword>team</keyword>
+#   <keyword>customer</keyword>
+#   <keyword>project</keyword>
+#   <keyword>team</keyword>
+#   <keyword>customer</keyword>
+#   <keyword>project</keyword>
+#   <keyword>team</keyword>
+#   <keyword>customer</keyword>
+#   <keyword>project</keyword>
+#   <keyword>team</keyword>
+#   <keyword>customer</keyword>
+#   <keyword>project</keyword>
+#   <keyword>team</keyword>
 # </keyword_list>
 # '''
 
@@ -81,7 +99,7 @@ if __name__ == "__main__":
 #    <name>Gautaman</name>
 #   </entity>
 #   <entity>
-#    <name>Dom</name>
+#    <name>Domnic</name>
 #   </entity>
 #   <entity>
 #    <name>Sriram</name>
@@ -251,51 +269,146 @@ if __name__ == "__main__":
 # </root>
 # '''
 
-    input_text=\
+#     input_text=\
+# '''
+# <dashboard _.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder='true' name='Area_context_filter'>
+#     <style />
+#     <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
+#     <datasources>
+#     <datasource caption='Orders (Super_Store_Sales)' name='federated.01m8s430ttzqwp11ntkqx1t7bri8' />
+#     </datasources>
+#     <datasource-dependencies datasource='federated.01m8s430ttzqwp11ntkqx1t7bri8'>
+#     <column datatype='string' name='[Category]' role='dimension' type='nominal' />
+#     <column caption='Sub Category' datatype='string' name='[Sub_Category]' role='dimension' type='nominal' />
+#     <column-instance column='[Category]' derivation='None' name='[none:Category:nk]' pivot='key' type='nominal' />
+#     <column-instance column='[Sub_Category]' derivation='None' name='[none:Sub_Category:nk]' pivot='key' type='nominal' />
+#     </datasource-dependencies>
+#     <zones>
+#     <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
+#         <zone h='98000' id='7' param='horz' type-v2='layout-flow' w='98400' x='800' y='1000'>
+#         <zone h='98000' id='5' type-v2='layout-basic' w='82400' x='800' y='1000'>
+#             <zone h='98000' id='3' name='Simple_area_context_filter' w='82400' x='800' y='1000'>
+#             <zone-style>
+#                 <format attr='border-color' value='#000000' />
+#                 <format attr='border-style' value='none' />
+#                 <format attr='border-width' value='0' />
+#                 <format attr='margin' value='4' />
+#             </zone-style>
+#             </zone>
+#         </zone>
+#         <zone fixed-size='160' h='98000' id='6' is-fixed='true' param='vert' type-v2='layout-flow' w='16000' x='83200' y='1000'>
+#             <zone h='56250' id='8' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Sub_Category:nk]' type-v2='filter' w='16000' x='83200' y='1000'>
+#             <zone-style>
+#                 <format attr='border-color' value='#000000' />
+#                 <format attr='border-style' value='none' />
+#                 <format attr='border-width' value='0' />
+#                 <format attr='margin' value='4' />
+#             </zone-style>
+#             </zone>
+#             <zone h='16000' id='9' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Category:nk]' type-v2='filter' w='16000' x='83200' y='57250'>
+#             <zone-style>
+#                 <format attr='border-color' value='#000000' />
+#                 <format attr='border-style' value='none' />
+#                 <format attr='border-width' value='0' />
+#                 <format attr='margin' value='4' />
+#             </zone-style>
+#             </zone>
+#         </zone>
+#         </zone>
+#         <zone-style>
+#         <format attr='border-color' value='#000000' />
+#         <format attr='border-style' value='none' />
+#         <format attr='border-width' value='0' />
+#         <format attr='margin' value='8' />
+#         </zone-style>
+#     </zone>
+#     </zones>
+#     <devicelayouts>
+#     <devicelayout auto-generated='true' name='Phone'>
+#         <size maxheight='700' minheight='700' sizing-mode='vscroll' />
+#         <zones>
+#         <zone h='100000' id='11' type-v2='layout-basic' w='100000' x='0' y='0'>
+#             <zone h='98000' id='10' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
+#             <zone h='56250' id='8' mode='checkdropdown' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Sub_Category:nk]' type-v2='filter' w='16000' x='83200' y='1000'>
+#                 <zone-style>
+#                 <format attr='border-color' value='#000000' />
+#                 <format attr='border-style' value='none' />
+#                 <format attr='border-width' value='0' />
+#                 <format attr='margin' value='4' />
+#                 <format attr='padding' value='0' />
+#                 </zone-style>
+#             </zone>
+#             <zone h='16000' id='9' mode='checkdropdown' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Category:nk]' type-v2='filter' w='16000' x='83200' y='57250'>
+#                 <zone-style>
+#                 <format attr='border-color' value='#000000' />
+#                 <format attr='border-style' value='none' />
+#                 <format attr='border-width' value='0' />
+#                 <format attr='margin' value='4' />
+#                 <format attr='padding' value='0' />
+#                 </zone-style>
+#             </zone>
+#             <zone fixed-size='280' h='98000' id='3' is-fixed='true' name='Simple_area_context_filter' w='82400' x='800' y='1000'>
+#                 <zone-style>
+#                 <format attr='border-color' value='#000000' />
+#                 <format attr='border-style' value='none' />
+#                 <format attr='border-width' value='0' />
+#                 <format attr='margin' value='4' />
+#                 <format attr='padding' value='0' />
+#                 </zone-style>
+#             </zone>
+#             </zone>
+#             <zone-style>
+#             <format attr='border-color' value='#000000' />
+#             <format attr='border-style' value='none' />
+#             <format attr='border-width' value='0' />
+#             <format attr='margin' value='8' />
+#             </zone-style>
+#         </zone>
+#         </zones>
+#     </devicelayout>
+#     </devicelayouts>
+#     <simple-id uuid='{2D1B3BF2-337D-4CC5-8B7B-007CBBACE9BA}' />
+# </dashboard>
+# '''
+
+    input_text = \
 '''
-<dashboard _.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder='true' name='Area_context_filter'>
+<dashboard _.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder='true' name='Area_with_analytics_1'>
     <style />
     <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
-    <datasources>
-    <datasource caption='Orders (Super_Store_Sales)' name='federated.01m8s430ttzqwp11ntkqx1t7bri8' />
-    </datasources>
-    <datasource-dependencies datasource='federated.01m8s430ttzqwp11ntkqx1t7bri8'>
-    <column datatype='string' name='[Category]' role='dimension' type='nominal' />
-    <column caption='Sub Category' datatype='string' name='[Sub_Category]' role='dimension' type='nominal' />
-    <column-instance column='[Category]' derivation='None' name='[none:Category:nk]' pivot='key' type='nominal' />
-    <column-instance column='[Sub_Category]' derivation='None' name='[none:Sub_Category:nk]' pivot='key' type='nominal' />
-    </datasource-dependencies>
     <zones>
     <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
-        <zone h='98000' id='7' param='horz' type-v2='layout-flow' w='98400' x='800' y='1000'>
-        <zone h='98000' id='5' type-v2='layout-basic' w='82400' x='800' y='1000'>
-            <zone h='98000' id='3' name='Simple_area_context_filter' w='82400' x='800' y='1000'>
-            <zone-style>
-                <format attr='border-color' value='#000000' />
-                <format attr='border-style' value='none' />
-                <format attr='border-width' value='0' />
-                <format attr='margin' value='4' />
-            </zone-style>
-            </zone>
+        <zone h='49000' id='3' name='Area with constant line' w='49200' x='800' y='1000'>
+        <zone-style>
+            <format attr='border-color' value='#000000' />
+            <format attr='border-style' value='none' />
+            <format attr='border-width' value='0' />
+            <format attr='margin' value='4' />
+        </zone-style>
         </zone>
-        <zone fixed-size='160' h='98000' id='6' is-fixed='true' param='vert' type-v2='layout-flow' w='16000' x='83200' y='1000'>
-            <zone h='56250' id='8' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Sub_Category:nk]' type-v2='filter' w='16000' x='83200' y='1000'>
-            <zone-style>
-                <format attr='border-color' value='#000000' />
-                <format attr='border-style' value='none' />
-                <format attr='border-width' value='0' />
-                <format attr='margin' value='4' />
-            </zone-style>
-            </zone>
-            <zone h='16000' id='9' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Category:nk]' type-v2='filter' w='16000' x='83200' y='57250'>
-            <zone-style>
-                <format attr='border-color' value='#000000' />
-                <format attr='border-style' value='none' />
-                <format attr='border-width' value='0' />
-                <format attr='margin' value='4' />
-            </zone-style>
-            </zone>
+        <zone h='49000' id='5' name='Area with average line' w='49200' x='50000' y='1000'>
+        <zone-style>
+            <format attr='border-color' value='#000000' />
+            <format attr='border-style' value='none' />
+            <format attr='border-width' value='0' />
+            <format attr='margin' value='4' />
+        </zone-style>
         </zone>
+        <zone h='49000' id='6' name='Area with median with quartiles (table)' w='49200' x='800' y='50000'>
+        <zone-style>
+            <format attr='border-color' value='#000000' />
+            <format attr='border-style' value='none' />
+            <format attr='border-width' value='0' />
+            <format attr='margin' value='4' />
+        </zone-style>
+        </zone>
+        <zone h='49000' id='7' name='Area with median with quartiles (pane)' w='49200' x='50000' y='50000'>
+        <zone-style>
+            <format attr='border-color' value='#000000' />
+            <format attr='border-style' value='none' />
+            <format attr='border-width' value='0' />
+            <format attr='margin' value='4' />
+        </zone-style>
         </zone>
         <zone-style>
         <format attr='border-color' value='#000000' />
@@ -307,11 +420,11 @@ if __name__ == "__main__":
     </zones>
     <devicelayouts>
     <devicelayout auto-generated='true' name='Phone'>
-        <size maxheight='700' minheight='700' sizing-mode='vscroll' />
+        <size maxheight='1200' minheight='1200' sizing-mode='vscroll' />
         <zones>
-        <zone h='100000' id='11' type-v2='layout-basic' w='100000' x='0' y='0'>
-            <zone h='98000' id='10' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
-            <zone h='56250' id='8' mode='checkdropdown' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Sub_Category:nk]' type-v2='filter' w='16000' x='83200' y='1000'>
+        <zone h='100000' id='25' type-v2='layout-basic' w='100000' x='0' y='0'>
+            <zone h='84000' id='24' param='vert' type-v2='layout-flow' w='84000' x='8000' y='8000'>
+            <zone fixed-size='280' h='49000' id='3' is-fixed='true' name='Area with constant line' w='49200' x='800' y='1000'>
                 <zone-style>
                 <format attr='border-color' value='#000000' />
                 <format attr='border-style' value='none' />
@@ -320,7 +433,7 @@ if __name__ == "__main__":
                 <format attr='padding' value='0' />
                 </zone-style>
             </zone>
-            <zone h='16000' id='9' mode='checkdropdown' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Category:nk]' type-v2='filter' w='16000' x='83200' y='57250'>
+            <zone fixed-size='280' h='49000' id='5' is-fixed='true' name='Area with average line' w='49200' x='50000' y='1000'>
                 <zone-style>
                 <format attr='border-color' value='#000000' />
                 <format attr='border-style' value='none' />
@@ -329,7 +442,16 @@ if __name__ == "__main__":
                 <format attr='padding' value='0' />
                 </zone-style>
             </zone>
-            <zone fixed-size='280' h='98000' id='3' is-fixed='true' name='Simple_area_context_filter' w='82400' x='800' y='1000'>
+            <zone fixed-size='280' h='49000' id='6' is-fixed='true' name='Area with median with quartiles (table)' w='49200' x='800' y='50000'>
+                <zone-style>
+                <format attr='border-color' value='#000000' />
+                <format attr='border-style' value='none' />
+                <format attr='border-width' value='0' />
+                <format attr='margin' value='4' />
+                <format attr='padding' value='0' />
+                </zone-style>
+            </zone>
+            <zone fixed-size='280' h='49000' id='7' is-fixed='true' name='Area with median with quartiles (pane)' w='49200' x='50000' y='50000'>
                 <zone-style>
                 <format attr='border-color' value='#000000' />
                 <format attr='border-style' value='none' />
@@ -349,10 +471,18 @@ if __name__ == "__main__":
         </zones>
     </devicelayout>
     </devicelayouts>
-    <simple-id uuid='{2D1B3BF2-337D-4CC5-8B7B-007CBBACE9BA}' />
+    <simple-id uuid='{E22402D0-0A87-4373-94D9-ADB94A8D0348}' />
 </dashboard>
 '''
 
+    input_text = \
+'''
+<zone h='98000' id='7'>
+    <_placeholder zone="true" /> 
+    <_placeholder zone_style="true" /> 
+    <_placeholder zone_type="true" /> 
+</zone>
+'''
 
 
     output = run_inference(input_text)

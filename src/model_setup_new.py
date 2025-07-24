@@ -368,19 +368,19 @@ class NLPCoder:
 
     def infer(self, input_text: str) -> str:
         inputs = self.tokenizer(
-            input_text, return_tensors='pt', max_length=1024,
+            input_text, return_tensors='pt', max_length=512,
             truncation=True
         ).to(self.model.device)
         with torch.no_grad():
             outputs = self.model.generate(
-                inputs['input_ids'], max_new_tokens=1024,
-                num_beams=5, early_stopping=False
+                inputs['input_ids'], max_new_tokens=256,
+                num_beams=1, early_stopping=True
             )
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
     def infer_batch(self, input_texts: List[str], 
-                    max_length: int = 1024,
-                    num_beams: int = 5) -> List[str]:
+                    max_length: int = 256,
+                    num_beams: int = 1) -> List[str]:
         """
         Performs generation on a batch of input strings.
         """
@@ -399,7 +399,7 @@ class NLPCoder:
                 attention_mask=encodings['attention_mask'],
                 max_new_tokens=max_length,
                 num_beams=num_beams,
-                early_stopping=False
+                early_stopping=True
             )
 
         # decode each sample in the batch
@@ -415,8 +415,9 @@ class NLPCoder:
             output_dir='./tmp_eval', report_to='none',
             predict_with_generate=True,
             per_device_eval_batch_size=2,
-            generation_num_beams=5,
-            generation_max_length=512
+            generation_num_beams=3,
+            generation_max_length=512,
+            # batch_eval_metrics='exact_match'
         )
         trainer = Seq2SeqTrainer(
             model=self.model, args=args,
@@ -424,5 +425,5 @@ class NLPCoder:
             compute_metrics=lambda p: compute_metrics(p, self.tokenizer)
         )
         preds = trainer.predict(tok_test_ds)
-        print(f"Optimized evaluation EM: {preds.metrics['exact_match']}")
+        print(f"Optimized evaluation EM: {preds.metrics}")
         return preds.metrics

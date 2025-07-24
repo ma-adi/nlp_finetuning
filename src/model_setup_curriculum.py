@@ -514,7 +514,7 @@ class NLPCoder:
                     save_total_limit=args.save_total_limit,
                     num_train_epochs=n_ep,
                     report_to=args.report_to if hasattr(args, "report_to") else "none",
-                    metric_for_best_model='exact_match',
+                    metric_for_best_model='eval_loss',
                 )
                 trainer = Seq2SeqTrainer(
                     model=self.model,
@@ -612,7 +612,7 @@ class NLPCoder:
             output_dir='./tmp_eval', report_to='none',
             predict_with_generate=True,
             per_device_eval_batch_size=2,
-            generation_num_beams=5,
+            generation_num_beams=3,
             generation_max_length=512
         )
         trainer = Seq2SeqTrainer(
@@ -621,5 +621,5 @@ class NLPCoder:
             compute_metrics=lambda p: compute_metrics(p, self.tokenizer)
         )
         preds = trainer.predict(tok_test_ds)
-        print(f"Optimized evaluation EM: {preds.metrics['exact_match']}")
+        print(f"Optimized evaluation EM: {preds.metrics}")
         return preds.metrics

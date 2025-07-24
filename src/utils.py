@@ -4,6 +4,7 @@ from typing import List, Any, Union, Set
 import tiktoken
 import json
 import re
+import xml.etree.ElementTree as ET
 
 # ==============================================================================
 # REWRITTEN XML CHUNKING LOGIC
@@ -270,6 +271,163 @@ def stitch_json_fragments(fragments: List[Union[dict, str]]) -> dict:
     return deep_merge(parsed)
 
 
+def normalize_xml_indentation(xml_string: str) -> str:
+    """
+    Parses an XML string and re-serializes it with a standardized,
+    pretty-printed indentation (2 spaces).
+
+    This is useful for normalizing real-world XML to match the style
+    of the generated training data.
+
+    Args:
+        xml_string: A string containing the raw XML data.
+
+    Returns:
+        A string containing the same XML data but with standardized indentation.
+        Returns the original string if parsing fails.
+    """
+    try:
+        # 1. Parse the raw XML string into an ElementTree object.
+        #    The fromstring function is robust to whitespace issues.
+        root = ET.fromstring(xml_string)
+
+        # 2. Apply the standard indentation.
+        #    This function modifies the tree in-place.
+        ET.indent(root, space="  ")
+
+        # 3. Re-serialize the tree back into a clean string.
+        #    'unicode' encoding is equivalent to utf-8 for this purpose.
+        normalized_string = ET.tostring(root, encoding='unicode')
+        
+        return normalized_string
+
+    except ET.ParseError as e:
+        print(f"Warning: Could not parse XML, returning original string. Error: {e}")
+        return xml_string
+
+# --- Example Usage ---
+
+# Your real-world XML with 4-space indentation
+real_world_xml = """
+<root>
+    <item>
+        <name>Apple</name>
+    </item>
+</root>
+"""
+
+# Your training data's style (2-space indentation)
+# This is what you want to match.
+target_style_xml = """
+<root>
+  <item>
+    <name>Apple</name>
+  </item>
+</root>
+"""
+
+# Normalize the real-world data
+normalized_output = normalize_xml_indentation(real_world_xml)
+
+print("--- Original Real-World XML ---")
+print(real_world_xml)
+print("\n--- Normalized XML (Matches Training Style) ---")
+print(normalized_output)
+
+# Verify that the normalized output matches the target style
+# (Ignoring leading/trailing whitespace for the comparison)
+assert normalized_output.strip() == target_style_xml.strip()
+print("\nNormalization successful!")
+
+
+
+def xml_parsing_with_ET(xml):
+    root = ET.fromstring(xml)
+
+    fragments = []
+    for zone in root.findall(".//zone"):
+        # Serialize this zone (with all nested elements) back to a string
+        fragments.append(
+            ET.tostring(zone, encoding="utf-8", xml_declaration=True).decode()
+        )
+
+    return fragments
+
+
+
+
+#### XML splitter v2
+
+
+import xml.etree.ElementTree as ET
+from copy import deepcopy
+
+def split_xml(
+    root: ET.Element,
+    max_tokens: int,
+    encode_fn,                       # (str) -> int
+    is_unit_of_interest=lambda e: True,
+):
+    """
+    Yields well-formed XML strings, each ≤ max_tokens when run through encode_fn.
+    Splits at any node where is_unit_of_interest(node) is True.
+    """
+    chunks = []
+    _split_node(root, max_tokens, encode_fn, is_unit_of_interest, chunks)
+    return chunks
+
+def _get_token_count(elem: ET.Element, encode_fn) -> int:
+    s = ET.tostring(elem, encoding="unicode")
+    return encode_fn(s)
+
+def _split_node(node, max_tokens, encode_fn, predicate, out_list):
+    # If this node isn’t a “unit” we care about, just recurse into children
+    if not predicate(node):
+        for child in node:
+            _split_node(child, max_tokens, encode_fn, predicate, out_list)
+        return
+
+    # If the entire subtree fits, emit and stop
+    if _get_token_count(node, encode_fn) <= max_tokens:
+        out_list.append(ET.tostring(node, encoding="unicode"))
+        return
+
+    # Otherwise we need to break it into pieces by grouping children
+    # — but keep the parent’s tag & attributes as context “shell.”
+    shell = ET.Element(node.tag, node.attrib)
+    shell_overhead = _get_token_count(shell, encode_fn)
+
+    group, group_tokens = [], 0
+    def flush_group():
+        if not group:
+            return
+        wrapper = deepcopy(shell)
+        for child in group:
+            wrapper.append(deepcopy(child))
+        out_list.append(ET.tostring(wrapper, encoding="unicode"))
+
+    for child in node:
+        # if a child itself is too large, first flush whatever’s pending,
+        # then recurse directly into that child (to split it further)
+        child_tokens = _get_token_count(child, encode_fn)
+        if shell_overhead + child_tokens > max_tokens:
+            flush_group()
+            group, group_tokens = [], 0
+            _split_node(child, max_tokens, encode_fn, predicate, out_list)
+            continue
+
+        # if adding this child would overflow our current batch, flush then start new
+        if shell_overhead + group_tokens + child_tokens > max_tokens:
+            flush_group()
+            group, group_tokens = [], 0
+
+        group.append(child)
+        group_tokens += child_tokens
+
+    flush_group()
+
+
+
 # Example CLI usage
 if __name__ == '__main__':
     import sys
@@ -289,3 +447,6 @@ if __name__ == '__main__':
 
     stitched = stitch_json_fragments(parts)
     print('Stitched JSON:', json.dumps(stitched, indent=2))
+
+
+

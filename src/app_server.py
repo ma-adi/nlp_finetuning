@@ -2,7 +2,8 @@
 from flask import Flask, request, jsonify
 from model_setup_new import NLPCoder # Assuming model_setup.py is in the same directory or accessible
 import os
-from utils import  split_xml_into_chunks, stitch_json_fragments
+from utils import  split_xml_into_chunks, stitch_json_fragments, split_xml
+from utils_v2 import create_xml_blueprint, stitch_json_from_blueprint
 import json
 
 import logging
@@ -22,8 +23,8 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-THRESHOLD_FOR_SPLIT = 100
-MAX_BATCH_SIZE = 3
+THRESHOLD_FOR_SPLIT = 101
+MAX_BATCH_SIZE = 1
 
 # Global variable to hold the loaded model
 model_inference = None
@@ -36,7 +37,7 @@ def load_model():
     if model_inference is None:
         print("Loading NLPCoder model... This will happen only once.")
         # Ensure the model path is correct for the environment where this server runs
-        model_path = '/Users/maadi5/nlp_finetuning/format_conversion_tagged_weights_exp1'
+        model_path = '/Users/maadi5/nlp_finetuning/master_curriculum_3000_weights_hint0.3_bestmodel_fixed'
         
         # Basic check if the path exists (optional, but good for debugging)
         if not os.path.exists(model_path):
@@ -70,36 +71,48 @@ def infer_endpoint():
 
     input_text = data['input_text']
 
-    split_xml = split_xml_into_chunks(xml_str=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
+    # split_chunks = split_xml(root=input_text,max_tokens=THRESHOLD_FOR_SPLIT)#(xml_str=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
+    blueprint, split_chunks = create_xml_blueprint(xml_string=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
 
-    if len(split_xml)>1:
+    # blueprint, split_xml = create_xml_blueprint(xml_text=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
+    if len(split_chunks)>1:
 
         try:
-            logging.info(f"Input split into {len(split_xml)} parts..")
+            logging.info(f"Input split into {len(split_chunks)} parts..")
             # logging.info(f"{json.dumps(split_xml, indent=2)}")
 
             groups = []
-            group = []
+            group = {}
             count = 0
-            for val in split_xml:
+            for key, val in split_chunks.items():
                 if count% MAX_BATCH_SIZE == 0 and count != 0:
                     groups.append(group)
-                    group = []
-                group.append(val)
+                    group = {}
+                group[key] = val
                 count += 1
 
+                if count == len(split_chunks):
+                    groups.append(group)
+
             # logging.info(f"groups: {groups}")
-            outputs_to_stitch = []
+            outputs_to_stitch = {}
             for idx, g in enumerate(groups):
                 logging.info(f'Running inference on batch {idx+1}. Batch size: {len(g)}')
-                outputs = model_inference.infer_batch(g)
-                outputs_to_stitch.extend(outputs)
+                keys = list(g.keys())
+                values_list = list(g.values())
+                outputs = model_inference.infer_batch(values_list)
+                output_dict = {}
+                for ind, k in enumerate(keys):
+                    output_dict[k] = outputs[ind]
+                    
+                outputs_to_stitch.update(output_dict)
 
             logging.info(f"Model outputs: ")
             logging.info(f"{json.dumps(outputs_to_stitch, indent=2)}")
 
             logging.info(f"Stitching model outputs...")
-            output = stitch_json_fragments(fragments=outputs_to_stitch)
+            # output = stitch_json_fragments(fragments=outputs_to_stitch)
+            output = stitch_json_from_blueprint(blueprint=blueprint, processed_json_chunks= outputs_to_stitch)
 
             return jsonify({"output": output})
         except Exception as e:
@@ -120,123 +133,6 @@ if __name__ == '__main__':
     load_model()
 
     app.run(host='127.0.0.1', port=5000)
-
-    ##Debug:
-
-#     input_text=\
-# '''
-# <dashboard _.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder='true' name='Area_context_filter'>
-#     <style />
-#     <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
-#     <datasources>
-#     <datasource caption='Orders (Super_Store_Sales)' name='federated.01m8s430ttzqwp11ntkqx1t7bri8' />
-#     </datasources>
-#     <datasource-dependencies datasource='federated.01m8s430ttzqwp11ntkqx1t7bri8'>
-#     <column datatype='string' name='[Category]' role='dimension' type='nominal' />
-#     <column caption='Sub Category' datatype='string' name='[Sub_Category]' role='dimension' type='nominal' />
-#     <column-instance column='[Category]' derivation='None' name='[none:Category:nk]' pivot='key' type='nominal' />
-#     <column-instance column='[Sub_Category]' derivation='None' name='[none:Sub_Category:nk]' pivot='key' type='nominal' />
-#     </datasource-dependencies>
-#     <zones>
-#     <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
-#         <zone h='98000' id='7' param='horz' type-v2='layout-flow' w='98400' x='800' y='1000'>
-#         <zone h='98000' id='5' type-v2='layout-basic' w='82400' x='800' y='1000'>
-#             <zone h='98000' id='3' name='Simple_area_context_filter' w='82400' x='800' y='1000'>
-#             <zone-style>
-#                 <format attr='border-color' value='#000000' />
-#                 <format attr='border-style' value='none' />
-#                 <format attr='border-width' value='0' />
-#                 <format attr='margin' value='4' />
-#             </zone-style>
-#             </zone>
-#         </zone>
-#         <zone fixed-size='160' h='98000' id='6' is-fixed='true' param='vert' type-v2='layout-flow' w='16000' x='83200' y='1000'>
-#             <zone h='56250' id='8' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Sub_Category:nk]' type-v2='filter' w='16000' x='83200' y='1000'>
-#             <zone-style>
-#                 <format attr='border-color' value='#000000' />
-#                 <format attr='border-style' value='none' />
-#                 <format attr='border-width' value='0' />
-#                 <format attr='margin' value='4' />
-#             </zone-style>
-#             </zone>
-#             <zone h='16000' id='9' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Category:nk]' type-v2='filter' w='16000' x='83200' y='57250'>
-#             <zone-style>
-#                 <format attr='border-color' value='#000000' />
-#                 <format attr='border-style' value='none' />
-#                 <format attr='border-width' value='0' />
-#                 <format attr='margin' value='4' />
-#             </zone-style>
-#             </zone>
-#         </zone>
-#         </zone>
-#         <zone-style>
-#         <format attr='border-color' value='#000000' />
-#         <format attr='border-style' value='none' />
-#         <format attr='border-width' value='0' />
-#         <format attr='margin' value='8' />
-#         </zone-style>
-#     </zone>
-#     </zones>
-#     <devicelayouts>
-#     <devicelayout auto-generated='true' name='Phone'>
-#         <size maxheight='700' minheight='700' sizing-mode='vscroll' />
-#         <zones>
-#         <zone h='100000' id='11' type-v2='layout-basic' w='100000' x='0' y='0'>
-#             <zone h='98000' id='10' param='vert' type-v2='layout-flow' w='98400' x='800' y='1000'>
-#             <zone h='56250' id='8' mode='checkdropdown' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Sub_Category:nk]' type-v2='filter' w='16000' x='83200' y='1000'>
-#                 <zone-style>
-#                 <format attr='border-color' value='#000000' />
-#                 <format attr='border-style' value='none' />
-#                 <format attr='border-width' value='0' />
-#                 <format attr='margin' value='4' />
-#                 <format attr='padding' value='0' />
-#                 </zone-style>
-#             </zone>
-#             <zone h='16000' id='9' mode='checkdropdown' name='Simple_area_context_filter' param='[federated.01m8s430ttzqwp11ntkqx1t7bri8].[none:Category:nk]' type-v2='filter' w='16000' x='83200' y='57250'>
-#                 <zone-style>
-#                 <format attr='border-color' value='#000000' />
-#                 <format attr='border-style' value='none' />
-#                 <format attr='border-width' value='0' />
-#                 <format attr='margin' value='4' />
-#                 <format attr='padding' value='0' />
-#                 </zone-style>
-#             </zone>
-#             <zone fixed-size='280' h='98000' id='3' is-fixed='true' name='Simple_area_context_filter' w='82400' x='800' y='1000'>
-#                 <zone-style>
-#                 <format attr='border-color' value='#000000' />
-#                 <format attr='border-style' value='none' />
-#                 <format attr='border-width' value='0' />
-#                 <format attr='margin' value='4' />
-#                 <format attr='padding' value='0' />
-#                 </zone-style>
-#             </zone>
-#             </zone>
-#             <zone-style>
-#             <format attr='border-color' value='#000000' />
-#             <format attr='border-style' value='none' />
-#             <format attr='border-width' value='0' />
-#             <format attr='margin' value='8' />
-#             </zone-style>
-#         </zone>
-#         </zones>
-#     </devicelayout>
-#     </devicelayouts>
-#     <simple-id uuid='{2D1B3BF2-337D-4CC5-8B7B-007CBBACE9BA}' />
-# </dashboard>
-# '''
-
-#     split_xml = split_xml_into_chunks(xml_str=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
-#     print(split_xml)
-
-#     json.dump(split_xml, open('split_xml.json', 'w', encoding='utf8'), ensure_ascii=False)
-
-#     for idx , val in enumerate(split_xml):
-#         output = model_inference.infer(val)
-
-#         print(f"input_{idx}: ", val)
-#         print(f"output_{idx}: ", output)
-
-
 
 
 

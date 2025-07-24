@@ -1,0 +1,473 @@
+2025-07-23 16:59:21,375 - root - INFO - Input split into 14 parts..
+2025-07-23 16:59:21,377 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 16:59:27,310 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 16:59:34,235 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 16:59:41,072 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 16:59:48,721 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 16:59:52,691 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 16:59:56,036 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 16:59:59,450 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:00:08,292 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:00:11,956 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:00:15,629 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:00:19,169 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:00:23,462 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:00:31,582 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:00:37,263 - root - INFO - Model outputs: 
+2025-07-23 17:00:37,264 - root - INFO - {
+  "chunk_e5463229": "{\"dashboard\": {\"_.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder=\"true\", \"name\": \"Area_context_filter\", \"style\": {\"size\": \"800\", \"minheight\": \"800\", \"minwidth\": \"1000\"}}}",
+  "chunk_9114ce27": "{\"dashboard\": {\"fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder\": \"true\", \"name\": \"Area_context_filter\", \"datasources\": [{\"datasource\": \"Orders (Super_Store_Sales)\", \"name\": \"federated.01m8s430ttzqwp11ntkqx1t7bri8\"}]}}",
+  "chunk_4d96f472": "{\"datasource-dependencies\": {\"datasource\": \"federated.01m8s430ttzqwp11ntkqx1t7bri8\", \"column\": [\"Category\", \"Sub Category\"]}}",
+  "chunk_38ddcf37": "{\"datasource-dependencies\": {\"datas\": \"federated.01m8s430ttzqwp11ntkqx1t7bri8\", \"column-instance\": [\"Category\", \"Sub_Category\"]}}",
+  "chunk_cfb60998": "{\"zone\": {\"h\": 98000, \"id\": \"3\", \"name\": \"Simple_area_context_filter\", \"w\": \"82400\", \"x\": \"800\", \"y\": \"1000\"}}",
+  "chunk_698fb506": "{\"zone-style\": {\"border-color\": \"#000000\", \"border-style\": \"none\", \"border-width\": \"0\", \"margin\": \"4\"}}",
+  "chunk_4f00f4fd": "{\"zone-style\": {\"border-color\": \"#000000\", \"border-style\": \"none\", \"border-width\": \"0\", \"margin\": \"4\"}}",
+  "chunk_5e71cfbe": "{\"zone\": {\"h\": \"100000\", \"id\": \"4\", \"type-v2\": \"layout-basic\", \"zone-style\": [{\"formatattr\": \"border-color\", \"value\": \"#000000\"}, {\"formatattr\": \"border-style\", \"value\": \"none\"}, {\"formatattr\": \"border-width\", \"value\": \"0\"}, {\"formatattr\": \"margin\", \"value\": \"8\"}]}}",
+  "chunk_a602f275": "{\"devicelayout\": {\"auto-generated\": \"true\", \"name\": \"Phone\", \"size maxheight\": 700, \"sizing-mode\": \"vscroll\"}}",
+  "chunk_e74f2793": "{\"zone-style\": {\"formatattr\": [\"border-color\", \"border-style\", \"border-width\", \"margin\", \"padding\"]}}",
+  "chunk_8ca8e245": "{\"zone-style\": {\"formatattr\": [\"border-color\", \"border-style\", \"border-width\", \"margin\", \"padding\"]}}",
+  "chunk_7ada9b05": "{\"zone-style\": {\"formatattr\": [\"border-color\", \"border-style\", \"border-width\", \"margin\", \"padding\"]}}",
+  "chunk_16d3f7ba": "{\"zone\": {\"h\": \"100000\", \"id\": \"11\", \"type-v2\": \"layout-basic\", \"zone-style\": [{\"formatattr\": \"border-color\", \"value\": \"#000000\"}, {\"formatattr\": \"border-style\", \"value\": \"none\"}, {\"formatattr\": \"border-width\", \"value\": \"0\"}, {\"formatattr\": \"margin\", \"value\": \"8\"}]}}",
+  "chunk_31cc36f8": "{\"dashboard\": {\"_.fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder\": \"true\", \"name\": \"Area_context_filter\", \"simple-id\": \"2D1B3BF2-337D-4CC5-8B7B-007CBBACE9BA\"}}"
+}
+2025-07-23 17:00:37,264 - root - INFO - Stitching model outputs...
+2025-07-23 17:04:10,794 - root - INFO - Input split into 14 parts..
+2025-07-23 17:04:10,796 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:04:16,548 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:04:23,279 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:04:30,041 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:04:37,727 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:04:41,663 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:04:44,983 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:04:48,386 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:04:56,805 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:05:00,356 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:05:03,919 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:05:07,576 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:05:11,203 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:05:19,535 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:13:55,136 - root - INFO - Input split into 14 parts..
+2025-07-23 17:13:55,138 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:14:00,793 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:14:08,131 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:14:15,117 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:14:22,205 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:14:25,782 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:14:29,124 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:14:32,720 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:14:40,344 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:14:43,563 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:14:46,942 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:14:50,791 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:14:54,510 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:15:02,998 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:17:39,864 - root - INFO - Input split into 14 parts..
+2025-07-23 17:17:39,865 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:17:45,395 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:17:52,144 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:17:59,151 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:18:06,927 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:18:11,316 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:18:14,645 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:18:18,190 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:18:26,643 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:18:30,210 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:18:33,855 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:18:37,734 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:18:41,432 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:18:49,872 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:21:43,173 - root - INFO - Input split into 14 parts..
+2025-07-23 17:21:43,174 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:21:48,729 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:21:55,972 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:22:03,895 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:22:12,198 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:22:16,738 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:22:20,551 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:22:24,376 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:22:33,777 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:22:37,657 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:22:41,498 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:22:45,338 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:22:49,127 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:22:58,824 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:29:43,274 - root - INFO - Input split into 14 parts..
+2025-07-23 17:29:43,275 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:29:49,236 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:29:55,812 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:30:01,934 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:30:08,699 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:30:12,365 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:30:15,382 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:30:18,347 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:30:25,972 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:30:29,237 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:30:32,542 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:30:35,744 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:30:38,888 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:30:46,401 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:37:51,099 - root - INFO - Input split into 14 parts..
+2025-07-23 17:37:51,100 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:37:56,602 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:38:04,286 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:38:11,598 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:38:19,533 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:38:24,337 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:38:28,197 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:38:31,829 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:38:40,065 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:38:43,745 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:38:47,448 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:38:51,210 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:38:54,920 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:39:03,834 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:43:09,965 - root - INFO - Input split into 14 parts..
+2025-07-23 17:43:09,965 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:43:15,249 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:43:22,195 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:43:29,094 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:43:36,770 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:43:40,805 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:43:44,214 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:43:47,596 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:43:56,086 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:43:59,614 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:44:03,285 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:44:06,942 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:44:10,627 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:44:19,285 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:46:47,206 - root - INFO - Input split into 14 parts..
+2025-07-23 17:46:47,207 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:46:52,626 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:46:59,517 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:47:06,512 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:47:14,058 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:47:18,025 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:47:21,458 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:47:24,863 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:47:33,284 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:47:36,775 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:47:40,467 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:47:44,139 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:47:47,812 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:47:56,554 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:49:37,816 - root - INFO - Input split into 14 parts..
+2025-07-23 17:49:37,817 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:49:43,228 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:49:50,396 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:49:57,195 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:50:04,813 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:50:08,765 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:50:12,224 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:50:15,826 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:50:24,217 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:50:27,729 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:50:31,384 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:50:35,026 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:50:38,756 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:50:47,442 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:54:23,055 - root - INFO - Input split into 14 parts..
+2025-07-23 17:54:23,056 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:54:28,357 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:54:34,994 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:54:41,677 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:54:49,034 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:54:53,000 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:54:56,366 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:54:59,673 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:55:07,723 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:55:11,356 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:55:15,055 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:55:18,582 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:55:22,097 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:55:30,088 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 17:57:06,937 - root - INFO - Input split into 14 parts..
+2025-07-23 17:57:06,938 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 17:57:12,283 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 17:57:18,854 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 17:57:25,184 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 17:57:32,341 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 17:57:36,075 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 17:57:39,186 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 17:57:42,358 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 17:57:50,143 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 17:57:53,589 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 17:57:56,942 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 17:58:00,310 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 17:58:03,664 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 17:58:11,527 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-23 18:14:01,769 - root - INFO - Input split into 14 parts..
+2025-07-23 18:14:01,770 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-23 18:14:07,298 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-23 18:14:14,325 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-23 18:14:21,196 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-23 18:14:28,681 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-23 18:14:32,683 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-23 18:14:36,134 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-23 18:14:39,567 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-23 18:14:47,876 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-23 18:14:51,425 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-23 18:14:55,116 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-23 18:14:58,876 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-23 18:15:02,706 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-23 18:15:11,219 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-24 09:03:52,218 - root - INFO - Input split into 14 parts..
+2025-07-24 09:03:52,219 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 09:03:59,115 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 09:04:06,470 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 09:04:13,233 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 09:04:20,801 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-24 09:04:24,766 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-24 09:04:28,057 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-24 09:04:31,310 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-24 09:04:39,568 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-24 09:04:43,067 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-24 09:04:46,511 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-24 09:04:49,969 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-24 09:04:53,401 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-24 09:05:01,619 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-24 12:02:51,221 - root - INFO - Preparing to run inference on 40 chunks.
+2025-07-24 12:02:51,222 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:02:57,989 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:03:02,287 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 12:03:05,800 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 12:03:09,267 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-24 12:03:13,427 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-24 12:03:17,996 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-24 12:03:22,614 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-24 12:03:27,076 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-24 12:07:11,587 - root - INFO - Preparing to run inference on 40 chunks.
+2025-07-24 12:07:11,589 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:07:18,679 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:07:23,078 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 12:07:37,855 - root - INFO - Preparing to run inference on 40 chunks.
+2025-07-24 12:07:37,855 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:07:45,302 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:07:49,790 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 12:07:52,987 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 12:07:56,629 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-24 12:08:00,528 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-24 12:08:04,868 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-24 12:08:09,445 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-24 12:08:13,778 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-24 12:10:24,062 - root - INFO - Preparing to run inference on 4 chunks.
+2025-07-24 12:10:24,064 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:12:29,586 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:12:30,960 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 12:12:31,941 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 12:12:35,364 - root - INFO - Model inference complete for all batches.
+2025-07-24 12:20:38,997 - root - INFO - Input split into 14 parts..
+2025-07-24 12:20:38,999 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:20:45,118 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:20:52,946 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 12:21:00,694 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 12:21:09,981 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-24 12:21:27,772 - root - INFO - Preparing to run inference on 4 chunks.
+2025-07-24 12:21:27,774 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:22:29,943 - root - INFO - Preparing to run inference on 4 chunks.
+2025-07-24 12:22:29,945 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:23:50,411 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 12:23:50,412 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:23:56,476 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:25:56,175 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 12:25:56,179 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:26:02,597 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:28:09,859 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 12:28:12,670 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 12:28:16,895 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-24 12:28:21,984 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-24 12:28:23,325 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-24 12:28:27,992 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-24 12:28:33,237 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-24 12:28:37,891 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-24 12:28:42,301 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-24 12:28:45,900 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-24 12:28:52,234 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-24 12:28:59,852 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-24 12:29:03,375 - root - INFO - Running inference on batch 15. Batch size: 1
+2025-07-24 12:29:10,782 - root - INFO - Running inference on batch 16. Batch size: 1
+2025-07-24 12:29:14,117 - root - INFO - Running inference on batch 17. Batch size: 1
+2025-07-24 12:29:18,064 - root - INFO - Running inference on batch 18. Batch size: 1
+2025-07-24 12:29:20,259 - root - INFO - Running inference on batch 19. Batch size: 1
+2025-07-24 12:29:23,191 - root - INFO - Running inference on batch 20. Batch size: 1
+2025-07-24 12:29:25,914 - root - INFO - Running inference on batch 21. Batch size: 1
+2025-07-24 12:29:27,233 - root - INFO - Running inference on batch 22. Batch size: 1
+2025-07-24 12:29:32,196 - root - INFO - Running inference on batch 23. Batch size: 1
+2025-07-24 12:29:36,986 - root - INFO - Running inference on batch 24. Batch size: 1
+2025-07-24 12:29:44,758 - root - INFO - Running inference on batch 25. Batch size: 1
+2025-07-24 12:29:48,506 - root - INFO - Running inference on batch 26. Batch size: 1
+2025-07-24 12:29:55,963 - root - INFO - Running inference on batch 27. Batch size: 1
+2025-07-24 12:29:59,537 - root - INFO - Running inference on batch 28. Batch size: 1
+2025-07-24 12:30:05,030 - root - INFO - Running inference on batch 29. Batch size: 1
+2025-07-24 12:30:08,655 - root - INFO - Running inference on batch 30. Batch size: 1
+2025-07-24 12:30:13,196 - root - INFO - Running inference on batch 31. Batch size: 1
+2025-07-24 12:30:17,741 - root - INFO - Model inference complete for all batches.
+2025-07-24 12:30:26,549 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 12:30:26,551 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:30:33,562 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:32:27,586 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 12:32:30,568 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 12:32:34,695 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-24 12:32:39,512 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-24 12:32:40,759 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-24 12:32:45,023 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-24 12:32:49,894 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-24 12:32:54,191 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-24 12:32:58,545 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-24 12:33:01,782 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-24 12:33:07,710 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-24 12:33:14,779 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-24 12:33:17,999 - root - INFO - Running inference on batch 15. Batch size: 1
+2025-07-24 12:33:25,839 - root - INFO - Running inference on batch 16. Batch size: 1
+2025-07-24 12:33:29,053 - root - INFO - Running inference on batch 17. Batch size: 1
+2025-07-24 12:33:32,980 - root - INFO - Running inference on batch 18. Batch size: 1
+2025-07-24 12:33:34,967 - root - INFO - Running inference on batch 19. Batch size: 1
+2025-07-24 12:33:37,954 - root - INFO - Running inference on batch 20. Batch size: 1
+2025-07-24 12:33:40,613 - root - INFO - Running inference on batch 21. Batch size: 1
+2025-07-24 12:33:41,835 - root - INFO - Running inference on batch 22. Batch size: 1
+2025-07-24 12:33:46,623 - root - INFO - Running inference on batch 23. Batch size: 1
+2025-07-24 12:33:51,466 - root - INFO - Running inference on batch 24. Batch size: 1
+2025-07-24 12:33:59,307 - root - INFO - Running inference on batch 25. Batch size: 1
+2025-07-24 12:34:02,892 - root - INFO - Running inference on batch 26. Batch size: 1
+2025-07-24 12:34:10,748 - root - INFO - Running inference on batch 27. Batch size: 1
+2025-07-24 12:34:14,059 - root - INFO - Running inference on batch 28. Batch size: 1
+2025-07-24 12:34:18,994 - root - INFO - Running inference on batch 29. Batch size: 1
+2025-07-24 12:34:22,327 - root - INFO - Running inference on batch 30. Batch size: 1
+2025-07-24 12:34:25,639 - root - INFO - Running inference on batch 31. Batch size: 1
+2025-07-24 12:34:29,458 - root - INFO - Model inference complete for all batches.
+2025-07-24 12:46:14,831 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 12:46:14,834 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:46:21,440 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:56:54,050 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 12:57:18,905 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 12:57:25,869 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 12:59:29,063 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 12:59:32,008 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 12:59:36,353 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-24 12:59:41,616 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-24 12:59:43,005 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-24 12:59:47,759 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-24 12:59:53,038 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-24 12:59:57,760 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-24 13:00:02,365 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-24 13:00:05,776 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-24 13:00:12,271 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-24 13:00:20,104 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-24 13:00:23,618 - root - INFO - Running inference on batch 15. Batch size: 1
+2025-07-24 13:00:31,491 - root - INFO - Running inference on batch 16. Batch size: 1
+2025-07-24 13:00:35,179 - root - INFO - Running inference on batch 17. Batch size: 1
+2025-07-24 13:00:39,443 - root - INFO - Running inference on batch 18. Batch size: 1
+2025-07-24 13:00:41,624 - root - INFO - Running inference on batch 19. Batch size: 1
+2025-07-24 13:00:44,637 - root - INFO - Running inference on batch 20. Batch size: 1
+2025-07-24 13:00:47,269 - root - INFO - Running inference on batch 21. Batch size: 1
+2025-07-24 13:00:48,708 - root - INFO - Running inference on batch 22. Batch size: 1
+2025-07-24 13:01:49,763 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 13:01:49,764 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 13:01:57,564 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 13:03:59,304 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 13:04:11,628 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 13:04:11,629 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 13:04:18,043 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 13:06:18,775 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 13:06:21,580 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 13:06:25,699 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-24 13:06:30,657 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-24 13:06:31,935 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-24 13:06:36,278 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-24 13:06:41,278 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-24 13:06:45,764 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-24 13:06:50,161 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-24 13:06:53,539 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-24 13:06:59,767 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-24 13:07:07,133 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-24 13:07:10,488 - root - INFO - Running inference on batch 15. Batch size: 1
+2025-07-24 13:07:17,853 - root - INFO - Running inference on batch 16. Batch size: 1
+2025-07-24 13:07:21,161 - root - INFO - Running inference on batch 17. Batch size: 1
+2025-07-24 13:07:24,998 - root - INFO - Running inference on batch 18. Batch size: 1
+2025-07-24 13:07:27,019 - root - INFO - Running inference on batch 19. Batch size: 1
+2025-07-24 13:07:29,905 - root - INFO - Running inference on batch 20. Batch size: 1
+2025-07-24 13:07:32,561 - root - INFO - Running inference on batch 21. Batch size: 1
+2025-07-24 13:07:33,843 - root - INFO - Running inference on batch 22. Batch size: 1
+2025-07-24 13:07:38,635 - root - INFO - Running inference on batch 23. Batch size: 1
+2025-07-24 13:07:43,477 - root - INFO - Running inference on batch 24. Batch size: 1
+2025-07-24 13:07:51,229 - root - INFO - Running inference on batch 25. Batch size: 1
+2025-07-24 13:07:55,007 - root - INFO - Running inference on batch 26. Batch size: 1
+2025-07-24 13:08:02,903 - root - INFO - Running inference on batch 27. Batch size: 1
+2025-07-24 13:08:06,701 - root - INFO - Running inference on batch 28. Batch size: 1
+2025-07-24 13:08:12,508 - root - INFO - Running inference on batch 29. Batch size: 1
+2025-07-24 13:08:16,340 - root - INFO - Running inference on batch 30. Batch size: 1
+2025-07-24 13:08:20,349 - root - INFO - Running inference on batch 31. Batch size: 1
+2025-07-24 13:08:24,762 - root - INFO - Model inference complete for all batches.
+2025-07-24 13:08:24,762 - root - INFO - outputs to stitch: {'chunk_entity_ecfc7081': '{"dashboard": {"fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder": "true", "name": "Area_context_filter"}}', 'chunk_entity_b7b3c0e9': '{"style": {"style": ["style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style"]}}', 'chunk_entity_949cf35a': '{"size": {"maxheight": "800", "maxwidth": "1000", "minheight": "800", "minwidth": "1000"}}', 'chunk_entity_ca485b28': '{"datasources": {"datasource": ["Orders (Super_Store_Sales)", "Federated.01m8s430ttzqwp11ntkqx1t7bri8"]}}', 'chunk_entity_19ae77ee': '{"datasource-dependencies": {"datasource": "federated.01m8s430ttzqwp11ntkqx1t7bri8", "dfe7c7c": ["Category", "Sub Category", "Derivation", "Pivot"]}}', 'chunk_entity_257d932d': '{"zones": {"zone": "/zone"}}', 'chunk_entity_cd31a19e': '{"zone": {"h": "100000", "id": 4, "type-v2": "layout-basic", "w": "100000", "x": "0", "y": "0"}}', 'chunk_entity_0d786dad': '{"zone": {"h": 98000, "id": 7, "param": "horz", "type-v2": "layout-flow", "w": "98400", "x": "800", "y": "1000"}}', 'chunk_entity_c7f56b5d': '{"zone": {"h": 98000, "id": "5", "type-v2": "layout-basic", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_c5cdca30': '{"zone": {"h": 98000, "id": "3", "name": "Simple_area_context_filter", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_fa4b075f': '{"zone-style": {"border-color": "#000000", "border-style": "none", "border-width": "0", "margin": "4"}}', 'chunk_entity_857140a2': '{"zone": {"fixed-size": 160, "h": "98000", "id": "6", "is-fixed": "true", "param": "vert", "type-v2": "layout-flow", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_5139dc9f': '{"zone": {"h": 56250, "id": 8, "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_12476021': '{"zone-style": {"border-color": "#000000", "border-style": "none", "border-width": "0", "margin": "4"}}', 'chunk_entity_26702c52': '{"zone": {"h": "16000", "id": "9", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "57250"}}', 'chunk_entity_3e9773ce': '{"zone-style": {"border-color": "#000000", "border-style": "none", "border-width": "0", "margin": "4"}}', 'chunk_entity_32aefbdc': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_519f494c': '{"devicelayouts": {"devicelayout": []}}', 'chunk_entity_58319b60': '{"devicelayout": {"auto-generated": "true", "name": "Phone"}}', 'chunk_entity_b329cb8a': '{"size": {"maxheight": "700", "minheight": "700", "sizing-mode": "vscroll"}}', 'chunk_entity_eff99077': '{"zones": {"zone": []}}', 'chunk_entity_6aca8be7': '{"zone": {"h": "100000", "id": "11", "type-v2": "layout-basic", "w": "100000", "x": "0", "y": "0"}}', 'chunk_entity_0bef7804': '{"zone": {"h": 98000, "id": "10", "param": "vert", "type-v2": "layout-flow", "w": "98400", "x": "800", "y": "1000"}}', 'chunk_entity_d466d1a4': '{"zone": {"h": 56250, "id": 8, "mode": "checkdropdown", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_5ae180e0': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_e38d47de': '{"zone": {"h": 16000, "id": "9", "mode": "checkdropdown", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": 16000, "x": "83200", "y": "57250"}}', 'chunk_entity_0a2622db': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_ecba3848': '{"zone": {"fixed-size": 280, "h": "98000", "id": "3", "is-fixed": "true", "name": "Simple_area_context_filter", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_b13b55ff': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_f4923b95': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_45a7b431': '{"simple_id": {"uuid": "2D1B3BF2-337D-4CC5-8B7B-007CBBACE9BA"}}'}
+2025-07-24 13:12:33,220 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 13:12:33,221 - root - INFO - Running inference on batch 1. Batch size: 1
+2025-07-24 13:12:40,179 - root - INFO - Running inference on batch 2. Batch size: 1
+2025-07-24 13:14:33,224 - root - INFO - Running inference on batch 3. Batch size: 1
+2025-07-24 13:14:36,094 - root - INFO - Running inference on batch 4. Batch size: 1
+2025-07-24 13:14:40,371 - root - INFO - Running inference on batch 5. Batch size: 1
+2025-07-24 13:14:45,390 - root - INFO - Running inference on batch 6. Batch size: 1
+2025-07-24 13:14:46,683 - root - INFO - Running inference on batch 7. Batch size: 1
+2025-07-24 13:14:51,112 - root - INFO - Running inference on batch 8. Batch size: 1
+2025-07-24 13:14:56,257 - root - INFO - Running inference on batch 9. Batch size: 1
+2025-07-24 13:15:00,608 - root - INFO - Running inference on batch 10. Batch size: 1
+2025-07-24 13:15:05,113 - root - INFO - Running inference on batch 11. Batch size: 1
+2025-07-24 13:15:08,487 - root - INFO - Running inference on batch 12. Batch size: 1
+2025-07-24 13:15:14,737 - root - INFO - Running inference on batch 13. Batch size: 1
+2025-07-24 13:15:22,227 - root - INFO - Running inference on batch 14. Batch size: 1
+2025-07-24 13:15:25,616 - root - INFO - Running inference on batch 15. Batch size: 1
+2025-07-24 13:15:33,294 - root - INFO - Running inference on batch 16. Batch size: 1
+2025-07-24 13:15:36,618 - root - INFO - Running inference on batch 17. Batch size: 1
+2025-07-24 13:15:40,508 - root - INFO - Running inference on batch 18. Batch size: 1
+2025-07-24 13:15:42,611 - root - INFO - Running inference on batch 19. Batch size: 1
+2025-07-24 13:15:45,582 - root - INFO - Running inference on batch 20. Batch size: 1
+2025-07-24 13:15:48,296 - root - INFO - Running inference on batch 21. Batch size: 1
+2025-07-24 13:15:49,630 - root - INFO - Running inference on batch 22. Batch size: 1
+2025-07-24 13:15:54,617 - root - INFO - Running inference on batch 23. Batch size: 1
+2025-07-24 13:15:59,523 - root - INFO - Running inference on batch 24. Batch size: 1
+2025-07-24 13:16:07,399 - root - INFO - Running inference on batch 25. Batch size: 1
+2025-07-24 13:16:11,184 - root - INFO - Running inference on batch 26. Batch size: 1
+2025-07-24 13:16:19,079 - root - INFO - Running inference on batch 27. Batch size: 1
+2025-07-24 13:16:22,847 - root - INFO - Running inference on batch 28. Batch size: 1
+2025-07-24 13:16:28,663 - root - INFO - Running inference on batch 29. Batch size: 1
+2025-07-24 13:16:32,413 - root - INFO - Running inference on batch 30. Batch size: 1
+2025-07-24 13:16:36,291 - root - INFO - Running inference on batch 31. Batch size: 1
+2025-07-24 13:16:40,838 - root - INFO - Model inference complete for all batches.
+2025-07-24 13:16:40,839 - root - INFO - outputs to stitch: {'chunk_entity_2c3983a5': '{"dashboard": {"fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder": "true", "name": "Area_context_filter"}}', 'chunk_entity_b0ead3f3': '{"style": {"style": ["style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style"]}}', 'chunk_entity_5399186a': '{"size": {"maxheight": "800", "maxwidth": "1000", "minheight": "800", "minwidth": "1000"}}', 'chunk_entity_7e247004': '{"datasources": {"datasource": ["Orders (Super_Store_Sales)", "Federated.01m8s430ttzqwp11ntkqx1t7bri8"]}}', 'chunk_entity_2b31980c': '{"datasource-dependencies": {"datasource": "federated.01m8s430ttzqwp11ntkqx1t7bri8", "dfe7c7c": ["Category", "Sub Category", "Derivation", "Pivot"]}}', 'chunk_entity_bfd69997': '{"zones": {"zone": "/zone"}}', 'chunk_entity_199c1be6': '{"zone": {"h": "100000", "id": 4, "type-v2": "layout-basic", "w": "100000", "x": "0", "y": "0"}}', 'chunk_entity_8756d4ff': '{"zone": {"h": 98000, "id": 7, "param": "horz", "type-v2": "layout-flow", "w": "98400", "x": "800", "y": "1000"}}', 'chunk_entity_6551686b': '{"zone": {"h": 98000, "id": "5", "type-v2": "layout-basic", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_935f8fad': '{"zone": {"h": 98000, "id": "3", "name": "Simple_area_context_filter", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_8f73a87a': '{"zone-style": {"border-color": "#000000", "border-style": "none", "border-width": "0", "margin": "4"}}', 'chunk_entity_8b165529': '{"zone": {"fixed-size": 160, "h": "98000", "id": "6", "is-fixed": "true", "param": "vert", "type-v2": "layout-flow", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_533531d9': '{"zone": {"h": 56250, "id": 8, "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_f32b968f': '{"zone-style": {"border-color": "#000000", "border-style": "none", "border-width": "0", "margin": "4"}}', 'chunk_entity_94fb322e': '{"zone": {"h": "16000", "id": "9", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "57250"}}', 'chunk_entity_ca75021a': '{"zone-style": {"border-color": "#000000", "border-style": "none", "border-width": "0", "margin": "4"}}', 'chunk_entity_b87c6739': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_e773e32d': '{"devicelayouts": {"devicelayout": []}}', 'chunk_entity_e767b026': '{"devicelayout": {"auto-generated": "true", "name": "Phone"}}', 'chunk_entity_3b537dcb': '{"size": {"maxheight": "700", "minheight": "700", "sizing-mode": "vscroll"}}', 'chunk_entity_4fe3400a': '{"zones": {"zone": []}}', 'chunk_entity_9a6812c1': '{"zone": {"h": "100000", "id": "11", "type-v2": "layout-basic", "w": "100000", "x": "0", "y": "0"}}', 'chunk_entity_33918832': '{"zone": {"h": 98000, "id": "10", "param": "vert", "type-v2": "layout-flow", "w": "98400", "x": "800", "y": "1000"}}', 'chunk_entity_51dcc607': '{"zone": {"h": 56250, "id": 8, "mode": "checkdropdown", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_fcc1a621': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_29a715e3': '{"zone": {"h": 16000, "id": "9", "mode": "checkdropdown", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": 16000, "x": "83200", "y": "57250"}}', 'chunk_entity_6bc9bbe1': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_5a47ea91': '{"zone": {"fixed-size": 280, "h": "98000", "id": "3", "is-fixed": "true", "name": "Simple_area_context_filter", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_0899fb13': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_9403b08c': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_8e0b4b49': '{"simple_id": {"uuid": "2D1B3BF2-337D-4CC5-8B7B-007CBBACE9BA"}}'}
+2025-07-24 13:53:56,883 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 13:53:56,887 - root - INFO - Running inference on batch 1. Batch size: 2
+2025-07-24 13:57:39,070 - root - INFO - Running inference on batch 2. Batch size: 2
+2025-07-24 13:57:44,743 - root - INFO - Running inference on batch 3. Batch size: 2
+2025-07-24 13:57:52,383 - root - INFO - Running inference on batch 4. Batch size: 2
+2025-07-24 13:57:59,619 - root - INFO - Running inference on batch 5. Batch size: 2
+2025-07-24 13:58:05,982 - root - INFO - Running inference on batch 6. Batch size: 2
+2025-07-24 13:58:15,128 - root - INFO - Running inference on batch 7. Batch size: 2
+2025-07-24 13:58:26,445 - root - INFO - Running inference on batch 8. Batch size: 2
+2025-07-24 13:58:37,892 - root - INFO - Running inference on batch 9. Batch size: 2
+2025-07-24 13:58:43,629 - root - INFO - Running inference on batch 10. Batch size: 2
+2025-07-24 13:58:47,777 - root - INFO - Running inference on batch 11. Batch size: 2
+2025-07-24 14:02:49,226 - root - INFO - Running inference on batch 12. Batch size: 2
+2025-07-24 14:02:57,691 - root - INFO - Running inference on batch 13. Batch size: 2
+2025-07-24 14:05:20,517 - root - INFO - Running inference on batch 14. Batch size: 2
+2025-07-24 14:05:26,226 - root - INFO - Running inference on batch 15. Batch size: 2
+2025-07-24 14:05:30,350 - root - INFO - Running inference on batch 16. Batch size: 1
+2025-07-24 14:05:35,016 - root - INFO - Model inference complete for all batches.
+2025-07-24 14:05:35,017 - root - INFO - outputs to stitch: {'chunk_entity_9c990249': '{"dashboard": {"fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder": "true", "name": "Area_context_filter"}}', 'chunk_entity_76e7b62b': '{"style": {"style": ["style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style", "style"]}}', 'chunk_entity_4c1495b8': '{"size": {"maxheight": "800", "maxwidth": "1000", "minheight": "800", "minwidth": "1000"}}', 'chunk_entity_89538d57': '{"datasources": {"datasource": ["Orders (Super_Store_Sales)", "Federated.01m8s430ttzqwp11ntkqx1t7bri8"]}}', 'chunk_entity_a4246a6a': '{"datasource-dependencies": {"datasource": "federated.01m8s430ttzqwp11ntkqx1t7bri8", "dfe7c7c": ["Category", "Sub Category", "Derivation", "Pivot"]}}', 'chunk_entity_b2a6a239': '{"zones": {"zone": "/zone"}}', 'chunk_entity_a7e12ba0': '{"zone": {"h": "100000", "id": 4, "type-v2": "layout-basic", "w": "100000", "x": "0", "y": "0"}}', 'chunk_entity_be470721': '{"zone": {"h": 98000, "id": 7, "param": "horz", "type-v2": "layout-flow", "w": "98400", "x": "800", "y": "1000"}}', 'chunk_entity_95a96b35': '{"zone": {"h": 98000, "id": "5", "type-v2": "layout-basic", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_0c56ac31': '{"zone": {"h": 98000, "id": "3", "name": "Simple_area_context_filter", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_70eae572': '{"zone-style": {"border-color": "#000000", "border-style": "none", "border-width": "0", "margin": "4"}}', 'chunk_entity_1471d53c': '{"zone": {"fixed-size": 160, "h": "98000", "id": "6", "is-fixed": "true", "param": "vert", "type-v2": "layout-flow", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_d2c61457': '{"zone": {"h": 56250, "id": 8, "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_5ce7d6c8': '{"zone-style": {"border-color": "#000000", "border-style": "none", "border-width": "0", "margin": "4"}}', 'chunk_entity_1dea80e1': '{"zone": {"h": "16000", "id": "9", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "57250"}}', 'chunk_entity_40c869c8': '{"zone-style": {"border-color": "#000000", "border-style": "none", "border-width": "0", "margin": "4"}}', 'chunk_entity_72269638': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_eecf280e': '{"devicelayouts": {"devicelayout": []}}', 'chunk_entity_990f2045': '{"devicelayout": {"auto-generated": "true", "name": "Phone"}}', 'chunk_entity_8896834e': '{"size": {"maxheight": "700", "minheight": "700", "sizing-mode": "vscroll"}}', 'chunk_entity_07b2208c': '{"zones": {"zone": "/zones/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/zone/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/z/', 'chunk_entity_a1476a7d': '{"zone": {"h": "100000", "id": "11", "type-v2": "layout-basic", "w": "100000", "x": "0", "y": "0"}}', 'chunk_entity_c926ca3d': '{"zone": {"h": 98000, "id": "10", "param": "vert", "type-v2": "layout-flow", "w": "98400", "x": "800", "y": "1000"}}', 'chunk_entity_4c972780': '{"zone": {"h": 56250, "id": 8, "mode": "checkdropdown", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_2e2e9778': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_9db79f4b': '{"zone": {"h": 16000, "id": "9", "mode": "checkdropdown", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": 16000, "x": "83200", "y": "57250"}}', 'chunk_entity_39e78a66': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_d81d17dc': '{"zone": {"fixed-size": 280, "h": "98000", "id": "3", "is-fixed": "true", "name": "Simple_area_context_filter", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_39541051': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_02d9e774': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_3de2eb6c': '{"simple_id": {"uuid": "2D1B3BF2-337D-4CC5-8B7B-007CBBACE9BA"}}'}
+2025-07-24 14:10:39,096 - root - INFO - Preparing to run inference on 31 chunks.
+2025-07-24 14:10:39,096 - root - INFO - Running inference on batch 1. Batch size: 2
+2025-07-24 14:10:42,286 - root - INFO - Running inference on batch 2. Batch size: 2
+2025-07-24 14:10:45,769 - root - INFO - Running inference on batch 3. Batch size: 2
+2025-07-24 14:10:50,499 - root - INFO - Running inference on batch 4. Batch size: 2
+2025-07-24 14:10:54,852 - root - INFO - Running inference on batch 5. Batch size: 2
+2025-07-24 14:10:58,914 - root - INFO - Running inference on batch 6. Batch size: 2
+2025-07-24 14:11:04,337 - root - INFO - Running inference on batch 7. Batch size: 2
+2025-07-24 14:11:10,901 - root - INFO - Running inference on batch 8. Batch size: 2
+2025-07-24 14:11:17,681 - root - INFO - Running inference on batch 9. Batch size: 2
+2025-07-24 14:11:20,052 - root - INFO - Running inference on batch 10. Batch size: 2
+2025-07-24 14:11:22,397 - root - INFO - Running inference on batch 11. Batch size: 2
+2025-07-24 14:11:26,331 - root - INFO - Running inference on batch 12. Batch size: 2
+2025-07-24 14:11:35,232 - root - INFO - Running inference on batch 13. Batch size: 2
+2025-07-24 14:11:43,357 - root - INFO - Running inference on batch 14. Batch size: 2
+2025-07-24 14:11:48,004 - root - INFO - Running inference on batch 15. Batch size: 2
+2025-07-24 14:11:50,658 - root - INFO - Running inference on batch 16. Batch size: 1
+2025-07-24 14:11:53,855 - root - INFO - Model inference complete for all batches.
+2025-07-24 14:11:53,855 - root - INFO - outputs to stitch: {'chunk_entity_5cdd9714': '{"dashboard": {"fcp.AccessibleZoneTabOrder.true...enable-sort-zone-taborder": "true", "name": "Area_context_filter"}}', 'chunk_entity_6e012be9': '{"style": {"style": []}}', 'chunk_entity_3d1516f7': '{"size": {"maxheight": "800", "maxwidth": "1000", "minheight": "800", "minwidth": "1000"}}', 'chunk_entity_68128a15': '{"datasources": {"datasource": ["Orders (Super_Store_Sales)", "Federated.01m8s430ttzqwp11ntkqx1t7bri8"]}}', 'chunk_entity_79b4ddaa': '{"datasource-dependencies": {"datasource": "federated.01m8s430ttzqwp11ntkqx1t7bri8", "dfe7c9d9": ["Category", "Sub Category", "Derivation", "Pivot", "key"]}}', 'chunk_entity_854bdfc1': '{"zones": {"zone": []}}', 'chunk_entity_cde10cec': '{"zone": {"h": "100000", "id": 4, "type-v2": "layout-basic", "w": "100000", "x": "0", "y": "0"}}', 'chunk_entity_da85ff19': '{"zone": {"h": 98000, "id": 7, "param": "horz", "type-v2": "layout-flow", "w": "98400", "x": "800", "y": "1000"}}', 'chunk_entity_69dc841a': '{"zone": {"h": 98000, "id": 5, "type-v2": "layout-basic", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_b145202f': '{"zone": {"h": 98000, "id": 3, "name": "Simple_area_context_filter", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_719f11d3': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_6538d270': '{"zone": {"fixed-size": 160, "h": "98000", "id": 6, "is-fixed": "true", "param": "vert", "type-v2": "layout-flow", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_27b8d8ed': '{"zone": {"h": 56250, "id": 8, "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_9fc1c148': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_2e61da33': '{"zone": {"h": 16000, "id": "9", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "57250"}}', 'chunk_entity_da50f19f': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_e3a30f9d': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_f5235ab5': '{"devicelayouts": {"devicelayout": []}}', 'chunk_entity_9846cba4': '{"devicelayout": {"auto-generated": "true", "name": "Phone"}}', 'chunk_entity_a85653ee': '{"size": {"maxheight": "700", "minheight": "700", "sizing-mode": "vscroll"}}', 'chunk_entity_57ba0f2f': '{"zones": {"zone": []}}', 'chunk_entity_1937bf98': '{"zone": {"h": 100000, "id": "11", "type-v2": "layout-basic", "w": "100000", "x": "0", "y": "0"}}', 'chunk_entity_ff5fb238': '{"zone": {"h": 98000, "id": 10, "param": "vert", "type-v2": "layout-flow", "w": "98400", "x": "800", "y": "1000"}}', 'chunk_entity_945bc548': '{"zone": {"h": 56250, "id": 8, "mode": "checkdropdown", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": "16000", "x": "83200", "y": "1000"}}', 'chunk_entity_6fce5a21': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_ce4dd761': '{"zone": {"h": 16000, "id": "9", "mode": "checkdropdown", "name": "Simple_area_context_filter", "param": "federated.01m8s430ttzqwp11ntkqx1t7bri8.", "type-v2": "filter", "w": 16000, "x": "83200", "y": "57250"}}', 'chunk_entity_aad4b5e6': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_070e8197': '{"zone": {"fixed-size": 280, "h": "98000", "id": "3", "name": "Simple_area_context_filter", "w": "82400", "x": "800", "y": "1000"}}', 'chunk_entity_387d540d': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin", "padding"]}}', 'chunk_entity_c0f3407b': '{"zone-style": {"formatattr": ["border-color", "border-style", "border-width", "margin"]}}', 'chunk_entity_3351fd4c': '{"simple_id": {"uuid": "2D1B3BF2-337D-4CC5-8B7B-007CBBACE9BA"}}'}
