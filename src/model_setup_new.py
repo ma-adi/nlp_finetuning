@@ -171,19 +171,66 @@ class NLPCoder:
             print(f"\nPartitioned {len(unseen_test_data)} examples for the unseen holdout set.")
 
             # 5.5 Handle "Hint" Leakage
+            # if unseen_hint_proportion > 0.0 and unseen_test_data:
+            #     print(f"\nAttempting to leak a 'hint' of {unseen_hint_proportion:.1%} from the holdout set...")
+            #     hint_candidates = sorted([ex for ex in unseen_test_data if ex['complexity'] == 0], key=lambda x: id(x))
+            #     if not hint_candidates:
+            #         print("  > WARNING: No low-complexity (bin 0) examples found in holdout set. Cannot leak a hint.")
+            #     else:
+            #         n_to_leak = int(round(unseen_hint_proportion * len(unseen_test_data)))
+            #         n_to_leak = min(n_to_leak, len(hint_candidates))
+            #         hint_examples_for_train = hint_candidates[:n_to_leak]
+            #         leaked_ids = {id(ex) for ex in hint_examples_for_train}
+            #         unseen_test_data = [ex for ex in unseen_test_data if id(ex) not in leaked_ids]
+            #         remaining_data.extend(hint_examples_for_train) # Add hints to the pool to be split
+            #         print(f"  > Leaked {len(hint_examples_for_train)} low-complexity examples into the training pool.")
+            #         print(f"  > Holdout set size reduced to {len(unseen_test_data)}.")
+
             if unseen_hint_proportion > 0.0 and unseen_test_data:
-                print(f"\nAttempting to leak a 'hint' of {unseen_hint_proportion:.1%} from the holdout set...")
-                hint_candidates = sorted([ex for ex in unseen_test_data if ex['complexity'] == 0], key=lambda x: id(x))
-                if not hint_candidates:
-                    print("  > WARNING: No low-complexity (bin 0) examples found in holdout set. Cannot leak a hint.")
+                print(f"\nAttempting to leak a 'hint' of {unseen_hint_proportion:.1%} from the holdout set using cascading complexity...")
+                
+                # 1. Calculate the total number of hints to leak
+                n_target_hints = int(round(unseen_hint_proportion * len(unseen_test_data)))
+                # We can't leak more hints than there are examples in the holdout set
+                n_target_hints = min(n_target_hints, len(unseen_test_data))
+
+                hint_examples_for_train = []
+                
+                # 2. Iterate through complexity bins sequentially, from easiest to hardest
+                for bin_level in range(n_complexity_bins):
+                    n_still_needed = n_target_hints - len(hint_examples_for_train)
+                    
+                    # 3. If we have enough hints, stop searching
+                    if n_still_needed <= 0:
+                        break
+                    
+                    # 4. Find all available candidates at the current complexity level
+                    # We sort by id() to ensure the selection is deterministic
+                    candidates_at_this_level = sorted(
+                        [ex for ex in unseen_test_data if ex['complexity'] == bin_level],
+                        key=lambda x: id(x) 
+                    )
+                    
+                    if not candidates_at_this_level:
+                        continue # No examples at this level, check the next bin
+                        
+                    # 5. Decide how many to take from this bin's candidates
+                    n_to_take = min(n_still_needed, len(candidates_at_this_level))
+                    
+                    # 6. Add the selected hints to our collection
+                    hint_examples_for_train.extend(candidates_at_this_level[:n_to_take])
+
+                if not hint_examples_for_train:
+                    print("  > WARNING: Could not find any examples in the holdout set to leak as hints.")
                 else:
-                    n_to_leak = int(round(unseen_hint_proportion * len(unseen_test_data)))
-                    n_to_leak = min(n_to_leak, len(hint_candidates))
-                    hint_examples_for_train = hint_candidates[:n_to_leak]
+                    # Finalize the leak: move hints from unseen_test_data to remaining_data
                     leaked_ids = {id(ex) for ex in hint_examples_for_train}
                     unseen_test_data = [ex for ex in unseen_test_data if id(ex) not in leaked_ids]
-                    remaining_data.extend(hint_examples_for_train) # Add hints to the pool to be split
-                    print(f"  > Leaked {len(hint_examples_for_train)} low-complexity examples into the training pool.")
+                    remaining_data.extend(hint_examples_for_train)
+                    
+                    print(f"  > Leaked {len(hint_examples_for_train)} examples (target was {n_target_hints}) into the training pool.")
+                    hint_dist = Counter(ex['complexity'] for ex in hint_examples_for_train)
+                    print(f"  > Hint complexity distribution: {dict(sorted(hint_dist.items()))}")
                     print(f"  > Holdout set size reduced to {len(unseen_test_data)}.")
 
             # 6. Perform Stratified Split on Remainder
