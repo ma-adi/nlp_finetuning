@@ -49,6 +49,7 @@ class NLPCoder:
         holdout_format_ids: Optional[List[str]] = None,
         nested_holdout_format_ids: Optional[List[str]] = None,
         unseen_hint_proportion: float = 0.0,
+        force_complexity_split: bool = False
     ):
         self.model_identifier = model_identifier
         self.dataset_path = dataset_path
@@ -64,7 +65,9 @@ class NLPCoder:
         self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_identifier, trust_remote_code=True,low_cpu_mem_usage=True) # optional)
         self.model.to(self.device) # <--- MOVE THE MODEL HERE
         self.model.eval()
-        self.test_unseen_formats = test_unseen_formats
+        self.test_unseen_formats = test_unseen_formats,
+        self.force_complexity_split = force_complexity_split
+        
 
     def _load_and_split_raw_data(
         self,
@@ -104,7 +107,7 @@ class NLPCoder:
         # --- NEW: Check for `format_id` and choose splitting strategy ---
         has_format_id = 'format_id' in all_examples[0]
 
-        if has_format_id:
+        if has_format_id and not self.force_complexity_split:
             # --- PATH A: Original logic for format_id-based holdout splitting ---
             print("\nFound 'format_id'. Proceeding with unseen format holdout strategy.")
 
@@ -266,8 +269,12 @@ class NLPCoder:
             test_data = test_rem + unseen_test_data
 
         else:
-            # --- PATH B: New fallback logic for data without format_id ---
-            print("\n'format_id' not found. Falling back to standard stratified split based on complexity.")
+            # --- PATH B: New fallback logic for data without format_id OR if override is True ---
+            if self.force_complexity_split:
+                 print("\n`force_complexity_split` is True. Overriding format_id logic and falling back to standard stratified split.")
+            else:
+                 print("\n'format_id' not found. Falling back to standard stratified split based on complexity.")
+                    
             total_examples = len(all_examples)
             train_data, test_data = [], []
 
