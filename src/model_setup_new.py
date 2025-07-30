@@ -538,13 +538,20 @@ class NLPCoder:
 
 
 
-    def _load_and_prepare_data(self):
-        if not self.dataset_path:
-            raise ValueError("dataset_path required")
-        if self.nested_holdout_format_ids is None:
-            train, test = self._load_and_split_raw_data(self.dataset_path)
+    def _load_and_prepare_data(self, train_json = None, test_json = None):
+        
+        if (train_json) is None or (test_json is None):
+            if not self.dataset_path:
+                raise ValueError("dataset_path required")
+            if self.nested_holdout_format_ids is None:
+                train, test = self._load_and_split_raw_data(self.dataset_path)
+            else:
+                train, test = self._load_and_split_raw_data_nesting(self.dataset_path)
         else:
-            train, test = self._load_and_split_raw_data_nesting(self.dataset_path)
+            print("Loading predefined train and test data")
+            train = train_json
+            test = test_json
+        
         train_ds = Dataset.from_list(train)
         test_ds = Dataset.from_list(test)
 
@@ -573,11 +580,11 @@ class NLPCoder:
         inputs['labels'] = labels_ids
         return inputs
 
-    def fine_tune(self, train_epochs: int, batch_size: int):
+    def fine_tune(self, train_epochs: int, batch_size: int, train_json = None, test_json = None):
         torch.manual_seed(42)
         np.random.seed(42)
 
-        train_ds, eval_ds = self._load_and_prepare_data()
+        train_ds, eval_ds = self._load_and_prepare_data(train_json, test_json)
         tok_train = train_ds.map(
             self._tokenize_function, batched=True,
             remove_columns=train_ds.column_names
