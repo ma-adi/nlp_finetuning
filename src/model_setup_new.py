@@ -185,7 +185,7 @@ class NLPCoder:
             #         remaining_data.extend(hint_examples_for_train) # Add hints to the pool to be split
             #         print(f"  > Leaked {len(hint_examples_for_train)} low-complexity examples into the training pool.")
             #         print(f"  > Holdout set size reduced to {len(unseen_test_data)}.")
-
+            
             if unseen_hint_proportion > 0.0 and unseen_test_data:
                 print(f"\nAttempting to leak a 'hint' of {unseen_hint_proportion:.1%} from the holdout set using cascading complexity...")
                 
@@ -416,12 +416,12 @@ class NLPCoder:
     def infer(self, input_text: str) -> str:
         inputs = self.tokenizer(
             input_text, return_tensors='pt', max_length=512,
-            truncation=True
+            truncation=False
         ).to(self.model.device)
         with torch.no_grad():
             outputs = self.model.generate(
-                inputs['input_ids'], max_new_tokens=256,
-                num_beams=1, early_stopping=True
+                inputs['input_ids'], max_new_tokens=512,
+                num_beams=3, early_stopping=False
             )
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
