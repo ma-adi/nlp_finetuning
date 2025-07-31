@@ -757,9 +757,18 @@ class NLPCoder:
         print("Generation complete. Computing metrics...")
         em_metric = evaluate.load("exact_match")
         results = em_metric.compute(predictions=all_predictions, references=reference_texts)
+
+        # 3. Compute metrics
+        pred_arr = np.array(all_predictions)
+        truth_arr = np.array(reference_texts)
+        # Create a boolean mask for mismatches
+        mismatch_mask = pred_arr != truth_arr
+
+        # Extract mismatched pairs
+        mismatches = list(zip(pred_arr[mismatch_mask], truth_arr[mismatch_mask]))
         
         print(f"Evaluation results: {results}")
-        return results
+        return results, mismatches
 
     def eval_mismatch(self, test_dataset: Dataset, batch_size: int = 16, num_beams: int = 3):
         """
