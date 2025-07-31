@@ -540,6 +540,7 @@ class NLPCoder:
 
     def _load_and_prepare_data(self, train_json = None, test_json = None):
         
+        
         if (train_json) is None or (test_json is None):
             if not self.dataset_path:
                 raise ValueError("dataset_path required")
@@ -549,8 +550,9 @@ class NLPCoder:
                 train, test = self._load_and_split_raw_data_nesting(self.dataset_path)
         else:
             print("Loading predefined train and test data")
-            train = train_json
-            test = test_json
+            train = json.load(open(train_json, encoding='utf8'))['dataset']
+            test = json.load(open(test_json, encoding='utf8'))['dataset']
+            
         
         train_ds = Dataset.from_list(train)
         test_ds = Dataset.from_list(test)
@@ -758,3 +760,45 @@ class NLPCoder:
         
         print(f"Evaluation results: {results}")
         return results
+
+    def eval_mismatch(self, test_dataset: Dataset, batch_size: int = 16, num_beams: int = 3):
+        """
+        A much faster, manual evaluation loop that bypasses the Seq2SeqTrainer.
+
+        Args:
+            test_dataset (Dataset): The test dataset, with "input_text" and "target_text" columns.
+            batch_size (int): The number of examples to process at once.
+            num_beams (int): The number of beams for generation.
+        
+        Returns:
+            dict: A dictionary containing the evaluation metrics (e.g., {'exact_match': 0.85}).
+        """
+        self.model.eval()
+        
+        # 1. Extract source and reference texts into lists
+        source_texts = test_dataset["input_text"]
+        reference_texts = test_dataset["target_text"]
+        
+        # 2. Generate predictions in batches
+        all_predictions = []
+        print(f"Generating predictions for {len(source_texts)} examples with batch size {batch_size}...")
+        
+        for i in tqdm(range(0, len(source_texts), batch_size)):
+            batch_inputs = source_texts[i : i + batch_size]
+            
+            # Use your existing batch inference method!
+            batch_preds = self.infer_batch(
+                batch_inputs, 
+                num_beams=num_beams
+            )
+            all_predictions.extend(batch_preds)
+            
+        # 3. Compute metrics
+        pred_arr = np.array(all_predictions)
+        truth_arr = np.array(reference_texts)
+        # Create a boolean mask for mismatches
+        mismatch_mask = pred_arr != truth_arr
+
+        # Extract mismatched pairs
+        mismatches = list(zip(pred_arr[mismatch_mask], truth_arr[mismatch_mask]))
+        return mismatches
