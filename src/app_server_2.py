@@ -22,7 +22,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-THRESHOLD_FOR_SPLIT = 101
+THRESHOLD_TOKENS_FOR_SPLIT = 50
 MAX_BATCH_SIZE = 12
 
 model_inference = None
@@ -35,8 +35,9 @@ def load_model():
     if model_inference is None:
         print("Loading NLPCoder model... This will happen only once.")
         # Ensure the model path is correct for the environment where this server runs
-        model_path = '/Users/maadi5/nlp_finetuning/master_curriculum_3000_weights_hint0.3_bestmodel_fixed'
-        
+        # model_path = '/Users/maadi5/nlp_finetuning/easy_master_curriculum_3_3000_weights_allformatstrain_bestmodel_fixed_noneindent_v2_emptylistdict'
+        model_path = '/Users/maadi5/nlp_finetuning/easy_master_curriculum_3_3_3000_allformatstrain_bestmodel_fixed_noneindent_v3_emptylistdict_randomnames/checkpoint-1920'
+
         # Basic check if the path exists (optional, but good for debugging)
         if not os.path.exists(model_path):
             print(f"Warning: Model path '{model_path}' does not exist. Please verify.")
@@ -109,11 +110,14 @@ def infer_endpoint():
 
     input_text = data['input_text']
 
+    #Remove indentation
+    input_text = input_text.strip().replace('\n', '').replace('  ', '')
+
     try:
         # 1. Instantiate the pipeline, injecting our real inference function
         pipeline = XmlToJsonPipeline(
             inference_function=real_inference_adapter,
-            list_split_threshold=THRESHOLD_FOR_SPLIT
+            # chunk_token_limit=THRESHOLD_TOKENS_FOR_SPLIT
         )
 
         # 2. Run the entire process with one simple call

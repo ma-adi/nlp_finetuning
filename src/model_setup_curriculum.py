@@ -11,6 +11,7 @@ from collections import Counter, defaultdict
 from itertools import combinations
 import re
 import os
+from tqdm import tqdm
 
 exact_match = evaluate.load("exact_match")
 
@@ -670,3 +671,43 @@ class NLPCoder:
         preds = trainer.predict(tok_test_ds)
         print(f"Optimized evaluation EM: {preds.metrics}")
         return preds.metrics
+    
+    def evaluate_fast(self, test_dataset: Dataset, batch_size: int = 16, num_beams: int = 3):
+        """
+        A much faster, manual evaluation loop that bypasses the Seq2SeqTrainer.
+
+        Args:
+            test_dataset (Dataset): The test dataset, with "input_text" and "target_text" columns.
+            batch_size (int): The number of examples to process at once.
+            num_beams (int): The number of beams for generation.
+        
+        Returns:
+            dict: A dictionary containing the evaluation metrics (e.g., {'exact_match': 0.85}).
+        """
+        self.model.eval()
+        
+        # 1. Extract source and reference texts into lists
+        source_texts = test_dataset["input_text"]
+        reference_texts = test_dataset["target_text"]
+        
+        # 2. Generate predictions in batches
+        all_predictions = []
+        print(f"Generating predictions for {len(source_texts)} examples with batch size {batch_size}...")
+        
+        for i in tqdm(range(0, len(source_texts), batch_size)):
+            batch_inputs = source_texts[i : i + batch_size]
+            
+            # Use your existing batch inference method!
+            batch_preds = self.infer_batch(
+                batch_inputs, 
+                num_beams=num_beams
+            )
+            all_predictions.extend(batch_preds)
+            
+        # 3. Compute metrics
+        print("Generation complete. Computing metrics...")
+        em_metric = evaluate.load("exact_match")
+        results = em_metric.compute(predictions=all_predictions, references=reference_texts)
+        
+        print(f"Evaluation results: {results}")
+        return results

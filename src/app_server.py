@@ -3,10 +3,11 @@ from flask import Flask, request, jsonify
 from model_setup_new import NLPCoder # Assuming model_setup.py is in the same directory or accessible
 import os
 from utils import  split_xml_into_chunks, stitch_json_fragments, split_xml
-from utils_v2 import create_xml_blueprint, stitch_json_from_blueprint
+# from utils_v2 import create_xml_blueprint, stitch_json_from_blueprint
 import json
 
 import logging
+import traceback
 
 # Configure logging
 logging.basicConfig(
@@ -37,8 +38,9 @@ def load_model():
     if model_inference is None:
         print("Loading NLPCoder model... This will happen only once.")
         # Ensure the model path is correct for the environment where this server runs
-        model_path = '/Users/maadi5/nlp_finetuning/master_curriculum_3000_weights_hint0.3_bestmodel_fixed'
-        
+        # model_path = '/Users/maadi5/nlp_finetuning/master_curriculum_3000_weights_hint0.3_bestmodel_fixed'
+        model_path = '/Users/maadi5/nlp_finetuning/easy_master_curriculum_3_3000_weights_allformatstrain_bestmodel_fixed_noneindent_v2_emptylistdict'
+
         # Basic check if the path exists (optional, but good for debugging)
         if not os.path.exists(model_path):
             print(f"Warning: Model path '{model_path}' does not exist. Please verify.")
@@ -53,6 +55,8 @@ def load_model():
             print("NLPCoder model loaded successfully.")
         except Exception as e:
             print(f"Error loading model: {e}")
+            logging.info("MODEL LOADING FAILED")
+            logging.info(traceback.format_exc())
             # Depending on the error, you might want to exit or disable inference
             model_inference = None # Ensure it's None if loading failed
 
@@ -71,62 +75,65 @@ def infer_endpoint():
 
     input_text = data['input_text']
 
-    # split_chunks = split_xml(root=input_text,max_tokens=THRESHOLD_FOR_SPLIT)#(xml_str=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
-    blueprint, split_chunks = create_xml_blueprint(xml_string=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
+    # # split_chunks = split_xml(root=input_text,max_tokens=THRESHOLD_FOR_SPLIT)#(xml_str=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
+    # blueprint, split_chunks = create_xml_blueprint(xml_string=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
 
-    # blueprint, split_xml = create_xml_blueprint(xml_text=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
-    if len(split_chunks)>1:
+    # # blueprint, split_xml = create_xml_blueprint(xml_text=input_text, max_tokens=THRESHOLD_FOR_SPLIT)
+    # if len(split_chunks)>1:
 
-        try:
-            logging.info(f"Input split into {len(split_chunks)} parts..")
-            # logging.info(f"{json.dumps(split_xml, indent=2)}")
+    #     try:
+    #         logging.info(f"Input split into {len(split_chunks)} parts..")
+    #         # logging.info(f"{json.dumps(split_xml, indent=2)}")
 
-            groups = []
-            group = {}
-            count = 0
-            for key, val in split_chunks.items():
-                if count% MAX_BATCH_SIZE == 0 and count != 0:
-                    groups.append(group)
-                    group = {}
-                group[key] = val
-                count += 1
+    #         groups = []
+    #         group = {}
+    #         count = 0
+    #         for key, val in split_chunks.items():
+    #             if count% MAX_BATCH_SIZE == 0 and count != 0:
+    #                 groups.append(group)
+    #                 group = {}
+    #             group[key] = val
+    #             count += 1
 
-                if count == len(split_chunks):
-                    groups.append(group)
+    #             if count == len(split_chunks):
+    #                 groups.append(group)
 
-            # logging.info(f"groups: {groups}")
-            outputs_to_stitch = {}
-            for idx, g in enumerate(groups):
-                logging.info(f'Running inference on batch {idx+1}. Batch size: {len(g)}')
-                keys = list(g.keys())
-                values_list = list(g.values())
-                outputs = model_inference.infer_batch(values_list)
-                output_dict = {}
-                for ind, k in enumerate(keys):
-                    output_dict[k] = outputs[ind]
+    #         # logging.info(f"groups: {groups}")
+    #         outputs_to_stitch = {}
+    #         for idx, g in enumerate(groups):
+    #             logging.info(f'Running inference on batch {idx+1}. Batch size: {len(g)}')
+    #             keys = list(g.keys())
+    #             values_list = list(g.values())
+    #             outputs = model_inference.infer_batch(values_list)
+    #             output_dict = {}
+    #             for ind, k in enumerate(keys):
+    #                 output_dict[k] = outputs[ind]
                     
-                outputs_to_stitch.update(output_dict)
+    #             outputs_to_stitch.update(output_dict)
 
-            logging.info(f"Model outputs: ")
-            logging.info(f"{json.dumps(outputs_to_stitch, indent=2)}")
+    #         logging.info(f"Model outputs: ")
+    #         logging.info(f"{json.dumps(outputs_to_stitch, indent=2)}")
 
-            logging.info(f"Stitching model outputs...")
-            # output = stitch_json_fragments(fragments=outputs_to_stitch)
-            output = stitch_json_from_blueprint(blueprint=blueprint, processed_json_chunks= outputs_to_stitch)
+    #         logging.info(f"Stitching model outputs...")
+    #         # output = stitch_json_fragments(fragments=outputs_to_stitch)
+    #         output = stitch_json_from_blueprint(blueprint=blueprint, processed_json_chunks= outputs_to_stitch)
 
-            return jsonify({"output": output})
-        except Exception as e:
-            print(f"Error during inference: {e}")
-            return jsonify({"error": f"An error occurred during inference: {str(e)}"}), 500
+    #         return jsonify({"output": output})
+    #     except Exception as e:
+    #         print(f"Error during inference: {e}")
+    #         return jsonify({"error": f"An error occurred during inference: {str(e)}"}), 500
 
-    else:
+    # else:
     
-        try:
-            output = model_inference.infer(input_text)
-            return jsonify({"output": output})
-        except Exception as e:
-            print(f"Error during inference: {e}")
-            return jsonify({"error": f"An error occurred during inference: {str(e)}"}), 500
+    try:
+        logging.info("GOING TO MODEL...")
+        output = model_inference.infer(input_text)
+        logging.info(f"output: {output}")
+        return jsonify({"output": output})
+    except Exception as e:
+        logging.info(f"Error during inference: {e}")
+        logging.info(traceback.format_exc())
+        return jsonify({"error": f"An error occurred during inference: {str(e)}"}), 500
 
 if __name__ == '__main__':
     # Load the model before starting the Flask application

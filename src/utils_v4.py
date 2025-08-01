@@ -13,7 +13,7 @@ class XmlToJsonPipeline:
     an ML conversion, and then reconstructing the final JSON.
     """
 
-    def __init__(self, inference_function, chunk_token_limit=25, child_batch_token_limit=100, attr_batch_token_limit=25):
+    def __init__(self, inference_function, chunk_token_limit=25, child_batch_token_limit=50, attr_batch_token_limit=20):
         """
         Initializes the pipeline.
 
@@ -127,178 +127,53 @@ class XmlToJsonPipeline:
         return namespaces
 
 
-    def _split_and_build_blueprint(self, xml_string: str):
-        self.blueprint = []
-        self.chunks = {}
-        self.root_node_id = None
-
-        # --- FIX 1: Register namespaces before processing ---
-        self._register_namespaces(xml_string)
-        # ---------------------------------------------------
-
-        try:
-            root_element = ET.fromstring(xml_string)
-        except ET.ParseError as e:
-            print(f"Error: Invalid XML provided. {e}")
-            return
-        
-        ## Splitting based on nesting units (with chunkable logic.. still working on it)
-
-        self._traverse_node(root_element, parent_id=None)
-
-        ## Splitting based on length
-
-        self._sub_split_large_chunks()
-
-
-    def _is_chunkable_unit(self, element: ET.Element) -> bool:
-        """
-        Determines if an element is a self-contained "unit of work" for the ML model.
-        A chunkable unit is an element whose children (if any) are all leaf nodes.
-        This correctly identifies <style/>, <zone-style>, and <column> as units,
-        while treating containers like <zones> and <datasource-dependencies> as
-        structural parents that need to be recursed into.
-        """
-        # If the element has no children, it's a simple, chunkable leaf.
-        if not list(element):
-            return True
-
-        # If it has children, check if any of THEM have children (i.e., grandchildren).
+    def _group_children_by_tag(self, element: ET.Element) -> dict:
+        """Helper function to group direct children of an element by their tag name."""
+        groups = defaultdict(list)
         for child in element:
-            if len(list(child)) > 0:
-                # Found a grandchild. This means the current element is a structural
-                # container (e.g., <zones>), not a chunkable unit.
-                return False
+            groups[child.tag].append(child)
+        return groups
 
-        # If we passed the check, it means all children are leaves.
-        # This makes the current element a perfect, self-contained chunk.
-        return True
-
-    def _sub_split_large_chunks(self):
+    # NEW HELPER FUNCTION - THE GATEKEEPER
+    def _create_or_recurse_on_chunk(self, parent_id: str, base_name: str, batch_elements: list):
         """
-        Second pass after initial chunking. Finds chunks that are too large based on
-        a TOKEN LIMIT, then splits them based on whether they are "long" (too many
-        children) or "wide" (too many attributes), using specialized thresholds for each.
+        Vets a potential chunk. If it's small enough, creates it. 
+        If it's too big, recurses on its contents instead.
         """
-        original_chunks = list(self.chunks.items())
+        wrapper = ET.Element("wrapper")
+        wrapper.extend(batch_elements)
+        xml_string = ET.tostring(wrapper, encoding='unicode')
 
-        for chunk_id, xml_string in original_chunks:
-            # The "Gatekeeper" check remains the same
-            if self._get_token_count(xml_string) <= self.chunk_token_limit:
-                continue
-
-            print(f"Chunk '{chunk_id}' is too large ({self._get_token_count(xml_string)} tokens). Analyzing for split...")
-            
-            try:
-                root = ET.fromstring(xml_string)
-                children = list(root)
-
-                original_blueprint_node = next((n for n in self.blueprint if n.get("chunk_id") == chunk_id), None)
-                if not original_blueprint_node:
-                    continue
-
-                if len(children) > 1:
-                    # --- A) "LONG" ELEMENT: Use the child batch specialist threshold ---
-                    print(f"-> Detected 'long' element. Splitting by children with limit: {self.child_batch_token_limit}...")
-                    
-                    del self.chunks[chunk_id]
-                    original_blueprint_node["chunk_id"] = None
-                    original_blueprint_node["is_list_container"] = True
-
-                    current_batch = []
-                    batch_num = 0
-                    for child in children:
-                        current_batch.append(child)
-                        temp_wrapper = ET.Element("wrapper")
-                        temp_wrapper.extend(current_batch)
-                        batch_str = ET.tostring(temp_wrapper, encoding='unicode')
-
-                        # --- CHANGE: Use the child-specific threshold ---
-                        if self._get_token_count(batch_str) > self.child_batch_token_limit and len(current_batch) > 1:
-                            final_batch_elements = current_batch[:-1]
-                            # ... (rest of this block is unchanged)
-                            wrapper = ET.Element("wrapper")
-                            wrapper.extend(final_batch_elements)
-                            new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_child_batch_{batch_num}"
-                            self.chunks[new_chunk_id] = ET.tostring(wrapper, encoding='unicode')
-                            self.blueprint.append({
-                                "node_id": new_chunk_id, "parent_id": original_blueprint_node["node_id"],
-                                "tag_name": "wrapper", "chunk_id": new_chunk_id, "is_batch": True
-                            })
-                            batch_num += 1
-                            current_batch = [child]
-
-                    if current_batch:
-                        # ... (this block is unchanged)
-                        wrapper = ET.Element("wrapper")
-                        wrapper.extend(current_batch)
-                        new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_child_batch_{batch_num}"
-                        self.chunks[new_chunk_id] = ET.tostring(wrapper, encoding='unicode')
-                        self.blueprint.append({
-                            "node_id": new_chunk_id, "parent_id": original_blueprint_node["node_id"],
-                            "tag_name": "wrapper", "chunk_id": new_chunk_id, "is_batch": True
-                        })
-
-                else:
-                    # --- B) "WIDE" ELEMENT: Use the attribute batch specialist threshold ---
-                    print(f"-> Detected 'wide' element. Splitting by attributes with limit: {self.attr_batch_token_limit}...")
-
-                    del self.chunks[chunk_id]
-                    original_blueprint_node["chunk_id"] = None
-                    original_blueprint_node["is_attribute_container"] = True
-
-                    attributes = list(root.attrib.items())
-                    current_batch_attrs = []
-                    batch_num = 0
-
-                    for key, value in attributes:
-                        current_batch_attrs.append((key, value))
-                        temp_element = ET.Element(root.tag, dict(current_batch_attrs))
-                        batch_str = ET.tostring(temp_element, encoding='unicode')
-
-                        # --- CHANGE: Use the attribute-specific threshold ---
-                        if self._get_token_count(batch_str) > self.attr_batch_token_limit and len(current_batch_attrs) > 1:
-                            final_batch_attrs = current_batch_attrs[:-1]
-                            # ... (rest of this block is unchanged)
-                            sub_element = ET.Element(root.tag, dict(final_batch_attrs))
-                            new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_attr_batch_{batch_num}"
-                            self.chunks[new_chunk_id] = ET.tostring(sub_element, encoding='unicode')
-                            self.blueprint.append({
-                                "node_id": new_chunk_id, "parent_id": original_blueprint_node["node_id"],
-                                "tag_name": root.tag, "chunk_id": new_chunk_id, "is_attribute_batch": True
-                            })
-                            batch_num += 1
-                            current_batch_attrs = [(key, value)]
-
-                    if current_batch_attrs:
-                        # ... (this block is unchanged)
-                        sub_element = ET.Element(root.tag, dict(current_batch_attrs))
-                        new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_attr_batch_{batch_num}"
-                        self.chunks[new_chunk_id] = ET.tostring(sub_element, encoding='unicode')
-                        self.blueprint.append({
-                            "node_id": new_chunk_id, "parent_id": original_blueprint_node["node_id"],
-                            "tag_name": root.tag, "chunk_id": new_chunk_id, "is_attribute_batch": True
-                        })
-                    
-                    if len(children) == 1:
-                        self._traverse_node(children[0], parent_id=original_blueprint_node["node_id"])
-
-            except ET.ParseError:
-                print(f"Warning: Chunk '{chunk_id}' is too large but could not be parsed for splitting.")
-                continue
+        # THE VETTING STEP
+        if self._get_token_count(xml_string) < self.child_batch_token_limit:
+            # The batch is small enough. Create the final chunk.
+            new_chunk_id = f"chunk_{base_name}"
+            self.chunks[new_chunk_id] = xml_string
+            self.blueprint.append({
+                "node_id": new_chunk_id,
+                "parent_id": parent_id,
+                "tag_name": "wrapper",
+                "chunk_id": new_chunk_id,
+                "is_batch": True
+            })
+        else:
+            # The batch is STILL too big. Do not create a chunk.
+            # Instead, process each of its elements individually.
+            print(f"-> Batch '{base_name}' was still too large. Recursing on its {len(batch_elements)} elements.")
+            for element in batch_elements:
+                self._traverse_and_chunk(element, parent_id=parent_id)
 
 
-    def _traverse_node(self, element: ET.Element, parent_id: str):
+    # THE CORRECTED TRAVERSAL FUNCTION
+    def _traverse_and_chunk(self, element: ET.Element, parent_id: str):
         """
-        Traverses every node to build a complete blueprint.
-        It creates chunks ONLY for "chunkable units" as defined by the new logic.
+        Builds the blueprint and uses the gatekeeper helper to ensure
+        all chunks are properly vetted.
         """
         node_id = f"{element.tag}_{uuid.uuid4().hex[:8]}"
         if self.root_node_id is None:
             self.root_node_id = node_id
 
-        is_chunkable = self._is_chunkable_unit(element)
-        
         blueprint_node = {
             "node_id": node_id,
             "parent_id": parent_id,
@@ -306,39 +181,117 @@ class XmlToJsonPipeline:
             "attributes": dict(element.attrib),
             "chunk_id": None,
         }
-
-        if is_chunkable:
-            # This is a unit of work. Create a chunk for the entire element.
-            chunk_id = f"chunk_{node_id}"
-            try:
-                # Optional: pretty-print the XML for the model
-                ET.indent(element, space="  ")
-            except AttributeError:
-                pass # ET.indent() not in Python < 3.9
-            self.chunks[chunk_id] = ET.tostring(element, encoding='unicode')
-            blueprint_node["chunk_id"] = chunk_id
-            # Add the node to the blueprint, but DO NOT recurse. The ML model
-            # handles this entire unit.
-        
         self.blueprint.append(blueprint_node)
 
-        if not is_chunkable:
-            # This is a structural parent. We MUST recurse into its children.
-            for child in element:
-                self._traverse_node(child, parent_id=node_id)
+        # --- Attribute splitting logic remains the same ---
+        hollow_element_str = ET.tostring(ET.Element(element.tag, element.attrib), encoding='unicode')
+        if self._get_token_count(hollow_element_str) > self.attr_batch_token_limit:
+            blueprint_node["is_attribute_container"] = True
+            # ... (rest of attribute splitting code is correct and unchanged)
+            attributes = list(element.attrib.items())
+            current_batch_attrs = []
+            batch_num = 0
+            for key, value in attributes:
+                current_batch_attrs.append((key, value))
+                temp_element = ET.Element(element.tag, dict(current_batch_attrs))
+                temp_element_str = ET.tostring(temp_element, encoding='unicode')
+                if self._get_token_count(temp_element_str) > self.attr_batch_token_limit and len(current_batch_attrs) > 1:
+                    final_batch_attrs = current_batch_attrs[:-1]
+                    sub_element = ET.Element(element.tag, dict(final_batch_attrs))
+                    new_chunk_id = f"chunk_{element.tag}_attr_batch_{batch_num}"
+                    self.chunks[new_chunk_id] = ET.tostring(sub_element, encoding='unicode')
+                    self.blueprint.append({
+                        "node_id": new_chunk_id, "parent_id": node_id,
+                        "tag_name": element.tag, "chunk_id": new_chunk_id, "is_attribute_batch": True
+                    })
+                    batch_num += 1
+                    current_batch_attrs = [(key, value)]
+            if current_batch_attrs:
+                sub_element = ET.Element(element.tag, dict(current_batch_attrs))
+                new_chunk_id = f"chunk_{element.tag}_attr_batch_{batch_num}"
+                self.chunks[new_chunk_id] = ET.tostring(sub_element, encoding='unicode')
+                self.blueprint.append({
+                    "node_id": new_chunk_id, "parent_id": node_id,
+                    "tag_name": element.tag, "chunk_id": new_chunk_id, "is_attribute_batch": True
+                })
+
+
+        # --- Child splitting logic with the fix ---
+        child_groups = self._group_children_by_tag(element)
+        processed_children = set()
+
+        for tag, children in child_groups.items():
+            if not children: continue
+
+            batches = []
+            current_batch = []
+            for child in children:
+                current_batch.append(child)
+                wrapper = ET.Element("wrapper")
+                wrapper.extend(current_batch)
+                if self._get_token_count(ET.tostring(wrapper, encoding='unicode')) > self.child_batch_token_limit and len(current_batch) > 1:
+                    batches.append(current_batch[:-1])
+                    current_batch = [child]
+            if current_batch:
+                batches.append(current_batch)
+
+            if batches:
+                # --- START: THE FIX IS HERE ---
+                # If we are making any batches at all, this node is a container.
+                # This is the crucial flag that prevents a hollow chunk from being made for the parent.
+                blueprint_node["is_list_container"] = True
+                # --- END: THE FIX ---
+
+                for i, batch_elements in enumerate(batches):
+                    base_name = f"{element.tag}_{tag}_batch_{i}"
+                    self._create_or_recurse_on_chunk(node_id, base_name, batch_elements)
+
+                for child in children:
+                    processed_children.add(child)
+
+        # --- Final check remains the same, but now works correctly ---
+        remaining_children = [c for c in element if c not in processed_children]
+
+        # A node is only a "final chunk" if it's NOT a container of any kind.
+        if not remaining_children and not blueprint_node.get("is_attribute_container") and not blueprint_node.get("is_list_container"):
+            blueprint_node["chunk_id"] = f"chunk_{node_id}"
+            # --- FIX: Use the full element content, not the hollowed-out string ---
+            # This correctly includes leaf children like <format> or text content.
+            self.chunks[blueprint_node["chunk_id"]] = self._create_simple_entity_chunk(element) 
+        else:
+            # Otherwise, if it has remaining children that weren't batched, recurse on them.
+            for child in remaining_children:
+                self._traverse_and_chunk(child, parent_id=node_id)
+
+
+    def _split_and_build_blueprint(self, xml_string: str):
+        """
+        Builds the blueprint and chunks in a single, robust pass.
+        This orchestrates the new `_traverse_and_chunk` logic.
+        """
+        # Reset state
+        self.blueprint = []
+        self.chunks = {}
+        self.root_node_id = None
+        
+        self._register_namespaces(xml_string)
+
+        try:
+            root_element = ET.fromstring(xml_string)
+        except ET.ParseError as e:
+            print(f"Error: Invalid XML provided. {e}")
+            return
+
+        # Start the single-pass traversal from the root
+        self._traverse_and_chunk(root_element, parent_id=None)
 
 
     def _reconstruct_from_blueprint(self, ml_results: dict) -> dict:
         """
-        Final corrected and resilient version.
-        - Catches JSONDecodeError from malformed ML outputs.
-        - Reports the error inline within the final JSON structure.
-        - Assumes ML model returns a wrapped object: {"tag": ...}
-        - Unwraps the object to store only the content in the workspace.
-        - Re-wraps content when assembling the parent.
+        Reconstructs the final JSON from the blueprint and ML results.
+        This version is robustly designed to handle attribute and child batches correctly.
         """
-        # This dictionary will store the UNWRAPPED CONTENT for each node_id.
-        final_objects = {}
+        workspace = {}
         
         node_map = {n['node_id']: n for n in self.blueprint}
         children_map = defaultdict(list)
@@ -350,79 +303,103 @@ class XmlToJsonPipeline:
             node_id = node_info['node_id']
             tag_name = node_info['tag_name']
             
-            content_obj = {}
+            content_for_this_node = {}
 
             if node_info.get("chunk_id"):
                 chunk_id = node_info['chunk_id']
-                raw_ml_result = ml_results.get(chunk_id, {})
+                raw_ml_result = ml_results.get(chunk_id, "{}")
                 
-                parsed_result = None
-                # --- START: RESILIENCE FIX ---
-                if isinstance(raw_ml_result, str):
-                    try:
-                        parsed_result = json.loads(raw_ml_result)
-                    except json.JSONDecodeError as e:
-                        # If the JSON is malformed, create an error object instead of crashing.
-                        # This allows the process to continue and reports the error in the output.
-                        print(f"ERROR: Malformed JSON from ML for chunk '{chunk_id}'. Error: {e}")
-                        parsed_result = {
-                            "__error__": "Malformed JSON from ML model",
-                            "raw_output": raw_ml_result
-                        }
-                else:
-                    # It's already a Python object (from a simulator or other source)
-                    parsed_result = raw_ml_result
-                # --- END: RESILIENCE FIX ---
+                try:
+                    parsed_result = json.loads(raw_ml_result) if isinstance(raw_ml_result, str) else raw_ml_result
+                except json.JSONDecodeError:
+                    parsed_result = {"__error__": "Malformed JSON from ML", "raw_output": raw_ml_result}
 
-                # --- CHANGE FOR ATTRIBUTE BATCHES ---
-                # If it's an attribute batch, the ML result might not be wrapped in the tag name.
-                # The result is the attributes themselves.
-                if node_info.get("is_attribute_batch"):
-                    content_obj = parsed_result
-
-                # UNWRAP the result from the model to get the pure content.
-                elif isinstance(parsed_result, dict) and tag_name in parsed_result:
-                    content_obj = parsed_result[tag_name]
+                if isinstance(parsed_result, dict) and tag_name in parsed_result:
+                    content_for_this_node = parsed_result[tag_name]
                 else:
-                    # If it's an error object or in an unexpected format, use it as is.
-                    # This ensures our error report is preserved.
-                    content_obj = parsed_result
+                    content_for_this_node = parsed_result
+            
             else:
-                # This is a structural node. Build its content from its children.
-                content_obj = {f"@{k}": v for k, v in node_info['attributes'].items()}
+                content_for_this_node = {f"@{k}": v for k, v in node_info['attributes'].items()}
                 
                 for child_info in children_map.get(node_id, []):
                     child_id = child_info['node_id']
                     child_tag = child_info['tag_name']
-                    
-                    # Get the UNWRAPPED content of the child from our workspace.
-                    child_content = final_objects.get(child_id)
+                    child_content = workspace.get(child_id, {})
 
-                    # --- NEW LOGIC FOR MERGING ATTRIBUTE BATCHES ---
                     if child_info.get("is_attribute_batch"):
-                        # If the child was an attribute batch, merge its content
-                        # directly into the parent's content object.
                         if isinstance(child_content, dict):
-                            content_obj.update(child_content)
-                        continue # Move to the next child
-                    # --- END NEW LOGIC ---
+                            content_for_this_node.update(child_content)
                     
-                    # Add the child's content to this parent.
-                    if child_tag in content_obj:
-                        if not isinstance(content_obj[child_tag], list):
-                            content_obj[child_tag] = [content_obj[child_tag]]
-                        content_obj[child_tag].append(child_content)
-                    else:
-                        is_list = len([c for c in children_map.get(node_id, []) if c['tag_name'] == child_tag]) > 1
-                        content_obj[child_tag] = [child_content] if is_list else child_content
-            
-            # Store the UNWRAPPED content for this node.
-            final_objects[node_id] = content_obj
+                    # --- START: THE FIX IS HERE ---
+                    elif child_info.get("is_batch"):
+                        # This child is a wrapper for a batch. Its content is a dictionary.
+                        # e.g., {"zone": [...]} OR {"border-color": "...", "border-style": "..."}
+                        if isinstance(child_content, dict):
+                            for key, value in child_content.items():
+                                # Check if the parent already has this key
+                                if key not in content_for_this_node:
+                                    # If not, just add it. The value is whatever the ML gave us.
+                                    content_for_this_node[key] = value
+                                else:
+                                    # The key exists. We need to merge/append.
+                                    # First, ensure the existing entry is a list.
+                                    if not isinstance(content_for_this_node[key], list):
+                                        content_for_this_node[key] = [content_for_this_node[key]]
 
-        # The very last step: get the root's content and wrap it with the root tag.
-        root_content = final_objects.get(self.root_node_id, {})
+                                    # Now, append/extend the new value(s).
+                                    if isinstance(value, list):
+                                        content_for_this_node[key].extend(value)
+                                    else:
+                                        content_for_this_node[key].append(value)
+                    # --- END: THE FIX ---
+                    
+                    else:
+                        # Default handling for a normal, nested child.
+                        if child_tag not in content_for_this_node:
+                            content_for_this_node[child_tag] = child_content
+                        else:
+                            # If key already exists, turn it into a list.
+                            if not isinstance(content_for_this_node[child_tag], list):
+                                content_for_this_node[child_tag] = [content_for_this_node[child_tag]]
+                            content_for_this_node[child_tag].append(child_content)
+
+            workspace[node_id] = content_for_this_node
+
+        root_content = workspace.get(self.root_node_id, {})
         root_tag_name = node_map[self.root_node_id]['tag_name']
         return {root_tag_name: root_content}
+    
+# In your XmlToJsonPipeline class
+
+    def _reconstruct_from_chunks(self, ml_results: dict) -> dict:
+        """
+        A simple stitcher that merges the results from the recursively split chunks.
+        """
+        final_json = {}
+
+        def deep_merge(d1, d2):
+            """Deeply merges d2 into d1."""
+            for k, v in d2.items():
+                if k in d1 and isinstance(d1[k], dict) and isinstance(v, dict):
+                    deep_merge(d1[k], v)
+                elif k in d1 and isinstance(d1[k], list) and isinstance(v, list):
+                    d1[k].extend(v)
+                else:
+                    d1[k] = v
+            return d1
+
+        for chunk_id, raw_ml_result in ml_results.items():
+            try:
+                parsed_result = json.loads(raw_ml_result) if isinstance(raw_ml_result, str) else raw_ml_result
+                final_json = deep_merge(final_json, parsed_result)
+            except json.JSONDecodeError:
+                final_json[f"__error_{chunk_id}"] = {
+                    "message": "Malformed JSON from ML",
+                    "raw_output": raw_ml_result
+                }
+        return final_json
+
 
     def _is_terminal_complex_node(self, element: ET.Element) -> bool:
         """
