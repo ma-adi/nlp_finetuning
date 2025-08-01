@@ -826,7 +826,7 @@ if __name__ == "__main__":
     </devicelayouts>
     <simple-id uuid='{DFC91EFC-2CB9-47DA-A940-7825DD8D4C13}' />
 </dashboard>
-    '''
+'''
 
 #     input_text = \
 # '''
@@ -915,9 +915,21 @@ if __name__ == "__main__":
 #   <record id="rec_e" value="105" status="ok" />
 #   </wrapper>'''
 
-    input_text = \
-'''
-<wrapper><calculation class=\"tableau\" formula=\"IF [Category] = &quot;Technology&quot; THEN TRUE &#13;&#10;ELSE FALSE&#13;&#10;END\" /></wrapper>'''
+#     input_text = \
+# '''
+# <wrapper><calculation class=\"tableau\" formula=\"IF [Category] = &quot;Technology&quot; THEN TRUE &#13;&#10;ELSE FALSE&#13;&#10;END\" /></wrapper>'''
+
+
+#     input_text = \
+# '''
+# <zones>
+#     <zone id="1" name="Parent">
+#         <zone id="1a" name="Child"/>
+#     </zone>
+#     <zone id="2" name="Sibling"/>
+# </zones>
+# '''
+
 
     output = run_inference(input_text)
 

@@ -71,6 +71,7 @@ class XmlToJsonPipeline:
         print("--- Step 1: Splitting XML and Building Blueprint ---")
         self._split_and_build_blueprint(xml_string)
         print(f"Blueprint created with {len(self.blueprint)} nodes.")
+        print("blueprint: ", self.blueprint)
         print(f"XML split into {len(self.chunks)} chunks for processing.\n")
         print(json.dumps(self.chunks, indent=2))
         print("--- Step 2: Running ML Model Inference ---")
@@ -286,13 +287,100 @@ class XmlToJsonPipeline:
         self._traverse_and_chunk(root_element, parent_id=None)
 
 
+    # def _reconstruct_from_blueprint(self, ml_results: dict) -> dict:
+    #     """
+    #     Reconstructs the final JSON from the blueprint and ML results.
+    #     This version is robustly designed to handle attribute and child batches correctly.
+    #     """
+    #     workspace = {}
+        
+    #     node_map = {n['node_id']: n for n in self.blueprint}
+    #     children_map = defaultdict(list)
+    #     for node in self.blueprint:
+    #         if node['parent_id']:
+    #             children_map[node['parent_id']].append(node)
+
+    #     for node_info in reversed(self.blueprint):
+    #         node_id = node_info['node_id']
+    #         tag_name = node_info['tag_name']
+            
+    #         content_for_this_node = {}
+
+    #         if node_info.get("chunk_id"):
+    #             chunk_id = node_info['chunk_id']
+    #             raw_ml_result = ml_results.get(chunk_id, "{}")
+                
+    #             try:
+    #                 parsed_result = json.loads(raw_ml_result) if isinstance(raw_ml_result, str) else raw_ml_result
+    #             except json.JSONDecodeError:
+    #                 parsed_result = {"__error__": "Malformed JSON from ML", "raw_output": raw_ml_result}
+
+    #             if isinstance(parsed_result, dict) and tag_name in parsed_result:
+    #                 content_for_this_node = parsed_result[tag_name]
+    #             else:
+    #                 content_for_this_node = parsed_result
+            
+    #         else:
+    #             content_for_this_node = {f"@{k}": v for k, v in node_info['attributes'].items()}
+                
+    #             for child_info in children_map.get(node_id, []):
+    #                 child_id = child_info['node_id']
+    #                 child_tag = child_info['tag_name']
+    #                 child_content = workspace.get(child_id, {})
+
+    #                 if child_info.get("is_attribute_batch"):
+    #                     if isinstance(child_content, dict):
+    #                         content_for_this_node.update(child_content)
+                    
+    #                 # --- START: THE FIX IS HERE ---
+    #                 elif child_info.get("is_batch"):
+    #                     # This child is a wrapper for a batch. Its content is a dictionary.
+    #                     # e.g., {"zone": [...]} OR {"border-color": "...", "border-style": "..."}
+    #                     if isinstance(child_content, dict):
+    #                         for key, value in child_content.items():
+    #                             # Check if the parent already has this key
+    #                             if key not in content_for_this_node:
+    #                                 # If not, just add it. The value is whatever the ML gave us.
+    #                                 content_for_this_node[key] = value
+    #                             else:
+    #                                 # The key exists. We need to merge/append.
+    #                                 # First, ensure the existing entry is a list.
+    #                                 if not isinstance(content_for_this_node[key], list):
+    #                                     content_for_this_node[key] = [content_for_this_node[key]]
+
+    #                                 # Now, append/extend the new value(s).
+    #                                 if isinstance(value, list):
+    #                                     content_for_this_node[key].extend(value)
+    #                                 else:
+    #                                     content_for_this_node[key].append(value)
+    #                 # --- END: THE FIX ---
+                    
+    #                 else:
+    #                     # Default handling for a normal, nested child.
+    #                     if child_tag not in content_for_this_node:
+    #                         content_for_this_node[child_tag] = child_content
+    #                     else:
+    #                         # If key already exists, turn it into a list.
+    #                         if not isinstance(content_for_this_node[child_tag], list):
+    #                             content_for_this_node[child_tag] = [content_for_this_node[child_tag]]
+    #                         content_for_this_node[child_tag].append(child_content)
+
+    #         workspace[node_id] = content_for_this_node
+
+    #     root_content = workspace.get(self.root_node_id, {})
+    #     root_tag_name = node_map[self.root_node_id]['tag_name']
+    #     return {root_tag_name: root_content}
+
+
+
+# In your XmlToJsonPipeline class
+
     def _reconstruct_from_blueprint(self, ml_results: dict) -> dict:
         """
-        Reconstructs the final JSON from the blueprint and ML results.
-        This version is robustly designed to handle attribute and child batches correctly.
+        Reconstructs the final JSON from the blueprint and ML results. This version
+        correctly unpacks ML results for both normal and batch chunks.
         """
         workspace = {}
-        
         node_map = {n['node_id']: n for n in self.blueprint}
         children_map = defaultdict(list)
         for node in self.blueprint:
@@ -302,26 +390,38 @@ class XmlToJsonPipeline:
         for node_info in reversed(self.blueprint):
             node_id = node_info['node_id']
             tag_name = node_info['tag_name']
-            
             content_for_this_node = {}
 
             if node_info.get("chunk_id"):
+                # This node was an ML chunk. Load and unpack its result.
                 chunk_id = node_info['chunk_id']
                 raw_ml_result = ml_results.get(chunk_id, "{}")
-                
                 try:
                     parsed_result = json.loads(raw_ml_result) if isinstance(raw_ml_result, str) else raw_ml_result
-                except json.JSONDecodeError:
-                    parsed_result = {"__error__": "Malformed JSON from ML", "raw_output": raw_ml_result}
+                except (json.JSONDecodeError, TypeError):
+                    parsed_result = {"__error__": "Malformed JSON", "raw": raw_ml_result}
 
-                if isinstance(parsed_result, dict) and tag_name in parsed_result:
-                    content_for_this_node = parsed_result[tag_name]
-                else:
+                # --- START: THE DEFINITIVE FIX IS HERE ---
+                # This logic correctly unpacks the content from the ML result.
+                if not isinstance(parsed_result, dict):
                     content_for_this_node = parsed_result
-            
+                elif node_info.get("is_batch"):
+                    # For a batch, the content is INSIDE the "wrapper" key.
+                    # ML Result: {"wrapper": {"format": [...]}}
+                    # We need: {"format": [...]}
+                    content_for_this_node = parsed_result.get("wrapper", {})
+                else:
+                    # For a normal chunk, the content is INSIDE the tag_name key.
+                    # ML Result: {"zone": {"@id": "4", ...}}
+                    # We need: {"@id": "4", ...}
+                    content_for_this_node = parsed_result.get(tag_name, {})
+                # --- END: THE DEFINITIVE FIX ---
+
             else:
-                content_for_this_node = {f"@{k}": v for k, v in node_info['attributes'].items()}
-                
+                # This node is a container; build it from its children.
+                if not node_info.get("is_attribute_container"):
+                    content_for_this_node = {f"@{k}": v for k, v in node_info.get('attributes', {}).items()}
+
                 for child_info in children_map.get(node_id, []):
                     child_id = child_info['node_id']
                     child_tag = child_info['tag_name']
@@ -329,37 +429,29 @@ class XmlToJsonPipeline:
 
                     if child_info.get("is_attribute_batch"):
                         if isinstance(child_content, dict):
+                            # Attribute batches are dictionaries of attributes; merge them directly.
                             content_for_this_node.update(child_content)
-                    
-                    # --- START: THE FIX IS HERE ---
-                    elif child_info.get("is_batch"):
-                        # This child is a wrapper for a batch. Its content is a dictionary.
-                        # e.g., {"zone": [...]} OR {"border-color": "...", "border-style": "..."}
-                        if isinstance(child_content, dict):
-                            for key, value in child_content.items():
-                                # Check if the parent already has this key
-                                if key not in content_for_this_node:
-                                    # If not, just add it. The value is whatever the ML gave us.
-                                    content_for_this_node[key] = value
-                                else:
-                                    # The key exists. We need to merge/append.
-                                    # First, ensure the existing entry is a list.
-                                    if not isinstance(content_for_this_node[key], list):
-                                        content_for_this_node[key] = [content_for_this_node[key]]
 
-                                    # Now, append/extend the new value(s).
-                                    if isinstance(value, list):
-                                        content_for_this_node[key].extend(value)
-                                    else:
-                                        content_for_this_node[key].append(value)
-                    # --- END: THE FIX ---
-                    
+                    elif child_info.get("is_batch"):
+                        # The child was a batch. Its content is now correctly unpacked
+                        # to a dict like {"format": [...]}. We merge this dict's items.
+                        if not isinstance(child_content, dict): continue
+
+                        for key_from_batch, value_from_batch in child_content.items():
+                            if key_from_batch not in content_for_this_node:
+                                content_for_this_node[key_from_batch] = value_from_batch
+                            else:
+                                if not isinstance(content_for_this_node[key_from_batch], list):
+                                    content_for_this_node[key_from_batch] = [content_for_this_node[key_from_batch]]
+                                if isinstance(value_from_batch, list):
+                                    content_for_this_node[key_from_batch].extend(value_from_batch)
+                                else:
+                                    content_for_this_node[key_from_batch].append(value_from_batch)
                     else:
-                        # Default handling for a normal, nested child.
+                        # This is a normal, non-batched child. Add it using its tag.
                         if child_tag not in content_for_this_node:
                             content_for_this_node[child_tag] = child_content
                         else:
-                            # If key already exists, turn it into a list.
                             if not isinstance(content_for_this_node[child_tag], list):
                                 content_for_this_node[child_tag] = [content_for_this_node[child_tag]]
                             content_for_this_node[child_tag].append(child_content)
