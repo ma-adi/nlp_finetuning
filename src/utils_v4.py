@@ -4,6 +4,7 @@ import uuid
 from collections import defaultdict
 import random
 from io import BytesIO
+import tiktoken
 
 class XmlToJsonPipeline:
     """
@@ -12,7 +13,7 @@ class XmlToJsonPipeline:
     an ML conversion, and then reconstructing the final JSON.
     """
 
-    def __init__(self, inference_function, list_split_threshold=100):
+    def __init__(self, inference_function, chunk_token_limit=101):
         """
         Initializes the pipeline.
 
@@ -20,12 +21,27 @@ class XmlToJsonPipeline:
             list_split_threshold (int): The number of identical sibling elements
                 above which they will be batched into a single "list" chunk.
         """
-        self.list_split_threshold = list_split_threshold
         self.inference_function = inference_function if callable(inference_function) else self._default_simulator
         # State stores for the process
         self.blueprint = []
         self.chunks = {}
         self.root_node_id = None
+        self.chunk_token_limit = chunk_token_limit
+        # Initialize the tokenizer once for efficiency
+        try:
+            self.tokenizer = tiktoken.get_encoding("cl100k_base")
+        except Exception:
+            # Fallback for environments where tiktoken might not be installed
+            print("Warning: tiktoken not found. Using character count as a fallback.")
+            self.tokenizer = None
+
+    def _get_token_count(self, text: str) -> int:
+        """Calculates the number of tokens in a string, with a fallback to character length."""
+        if self.tokenizer:
+            return len(self.tokenizer.encode(text))
+        else:
+            # Fallback if tiktoken is not available
+            return len(text)
 
     def _is_simple_entity(self, element: ET.Element) -> bool:
         """
@@ -58,34 +74,13 @@ class XmlToJsonPipeline:
         print("--- Step 2: Running ML Model Inference ---")
         ml_results = self._run_inference()
         print("Inference complete.\n")
-
+        print("ML results: ", ml_results)
         print("--- Step 3: Reconstructing JSON from Blueprint ---")
         final_json = self._reconstruct_from_blueprint(ml_results)
         print("Reconstruction complete.")
         
         return final_json
 
-    # Add these methods inside the XmlToJsonPipeline class
-
-    # def _split_and_build_blueprint(self, xml_string: str):
-    #     """
-    #     Parses the XML and recursively traverses it to build the blueprint
-    #     and generate chunks for the ML model.
-    #     """
-    #     # Clear previous state
-    #     self.blueprint = []
-    #     self.chunks = {}
-    #     self.root_node_id = None
-
-    #     # Use ElementTree for robust XML parsing
-    #     try:
-    #         root_element = ET.fromstring(xml_string)
-    #     except ET.ParseError as e:
-    #         print(f"Error: Invalid XML provided. {e}")
-    #         return
-
-        # Start the recursive traversal from the root
-        # self._traverse_node(root_element, parent_id=None)
 
     def _hollow_out_element(self, element: ET.Element) -> str:
         """Creates a string representation of an element with its attributes but no children."""
@@ -111,17 +106,6 @@ class XmlToJsonPipeline:
         # For simple entities, we do nothing, leaving the children intact.
         return ET.tostring(element_copy, encoding='unicode').strip()
 
-    # def _split_and_build_blueprint(self, xml_string: str):
-    #     self.blueprint = []
-    #     self.chunks = {}
-    #     self.root_node_id = None
-    #     try:
-    #         root_element = ET.fromstring(xml_string)
-    #     except ET.ParseError as e:
-    #         print(f"Error: Invalid XML provided. {e}")
-    #         return
-    #     # Start the recursive traversal.
-    #     self._traverse_node(root_element, parent_id=None)
 
     def _create_simple_entity_chunk(self, element: ET.Element) -> str:
         """Creates a chunk for a simple entity, which includes its children."""
@@ -140,16 +124,6 @@ class XmlToJsonPipeline:
             ET.register_namespace(prefix, uri)
         return namespaces
 
-    # def _split_and_build_blueprint(self, xml_string: str):
-    #     self.blueprint = []
-    #     self.chunks = {}
-    #     self.root_node_id = None
-    #     try:
-    #         root_element = ET.fromstring(xml_string)
-    #     except ET.ParseError as e:
-    #         print(f"Error: Invalid XML provided. {e}")
-    #         return
-    #     self._traverse_node(root_element, parent_id=None)
 
     def _split_and_build_blueprint(self, xml_string: str):
         self.blueprint = []
@@ -165,48 +139,136 @@ class XmlToJsonPipeline:
         except ET.ParseError as e:
             print(f"Error: Invalid XML provided. {e}")
             return
+        
+        ## Splitting based on nesting units (with chunkable logic.. still working on it)
+
         self._traverse_node(root_element, parent_id=None)
 
-    # def _traverse_node(self, element: ET.Element, parent_id: str):
-    #     """
-    #     Corrected traversal. Creates ONE blueprint node per element and decides
-    #     if it needs a chunk.
-    #     """
-    #     node_id = f"{element.tag}_{uuid.uuid4().hex[:8]}"
-    #     if self.root_node_id is None:
-    #         self.root_node_id = node_id
+        ## Splitting based on length
 
-    #     is_simple = self._is_simple_entity(element)
-        
-    #     # Create a chunk for EVERY element. The chunk's content depends on simplicity.
-    #     chunk_id = f"chunk_entity_{uuid.uuid4().hex[:8]}"
-    #     self.chunks[chunk_id] = self._create_entity_chunk(element, is_simple)
+        self._sub_split_large_chunks()
 
-    #     # Create ONE blueprint node for the current element.
-    #     self.blueprint.append({
-    #         "node_id": node_id,
-    #         "parent_id": parent_id,
-    #         "tag_name": element.tag,
-    #         "chunk_id": chunk_id,
-    #         "is_simple_entity": is_simple,
-    #     })
 
-    #     # Recurse ONLY if the entity is complex.
-    #     # If it's simple, its children are handled by the parent's chunk.
-    #     if not is_simple:
-    #         for child in element:
-    #             self._traverse_node(child, parent_id=node_id)
+    def _is_chunkable_unit(self, element: ET.Element) -> bool:
+        """
+        Determines if an element is a self-contained "unit of work" for the ML model.
+        A chunkable unit is an element whose children (if any) are all leaf nodes.
+        This correctly identifies <style/>, <zone-style>, and <column> as units,
+        while treating containers like <zones> and <datasource-dependencies> as
+        structural parents that need to be recursed into.
+        """
+        # If the element has no children, it's a simple, chunkable leaf.
+        if not list(element):
+            return True
+
+        # If it has children, check if any of THEM have children (i.e., grandchildren).
+        for child in element:
+            if len(list(child)) > 0:
+                # Found a grandchild. This means the current element is a structural
+                # container (e.g., <zones>), not a chunkable unit.
+                return False
+
+        # If we passed the check, it means all children are leaves.
+        # This makes the current element a perfect, self-contained chunk.
+        return True
+
+    def _sub_split_large_chunks(self):
+        """
+        Second pass after initial chunking. Finds chunks that are too large based on
+        a TOKEN LIMIT, then splits them into smaller, token-aware batches.
+        """
+        original_chunks = list(self.chunks.items())
+
+        for chunk_id, xml_string in original_chunks:
+            # --- CHANGE 1: Check against token limit instead of character limit ---
+            if self._get_token_count(xml_string) <= self.chunk_token_limit:
+                continue # This chunk is fine, skip it.
+
+            # This chunk is too big in tokens. Let's try to split it.
+            print(f"Chunk '{chunk_id}' is too large ({self._get_token_count(xml_string)} tokens). Performing token-based split...")
+            
+            try:
+                root = ET.fromstring(xml_string)
+                children = list(root)
+
+                # We can only split if there are multiple children to distribute.
+                if len(children) > 1:
+                    # Find the original blueprint node that pointed to this chunk
+                    original_blueprint_node = next((n for n in self.blueprint if n.get("chunk_id") == chunk_id), None)
+                    if not original_blueprint_node:
+                        continue
+
+                    # Remove the original large chunk and its reference in the blueprint
+                    del self.chunks[chunk_id]
+                    original_blueprint_node["chunk_id"] = None
+                    original_blueprint_node["is_list_container"] = True
+
+                    # --- CHANGE 2: Iterative, token-aware batching logic ---
+                    current_batch = []
+                    batch_num = 0
+                    for child in children:
+                        # Add the next child to our potential batch
+                        current_batch.append(child)
+                        
+                        # Create a temporary wrapper to measure the token count of the current batch
+                        temp_wrapper = ET.Element("wrapper")
+                        temp_wrapper.extend(current_batch)
+                        batch_str = ET.tostring(temp_wrapper, encoding='unicode')
+
+                        # If adding that last child pushed us over the limit...
+                        if self._get_token_count(batch_str) > self.chunk_token_limit and len(current_batch) > 1:
+                            # ...then the real batch is everything *before* that last child.
+                            final_batch_elements = current_batch[:-1]
+                            
+                            # Create the chunk for this completed batch
+                            wrapper = ET.Element("wrapper")
+                            wrapper.extend(final_batch_elements)
+                            new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_batch_{batch_num}"
+                            self.chunks[new_chunk_id] = ET.tostring(wrapper, encoding='unicode')
+
+                            # Create the blueprint node for this new chunk
+                            self.blueprint.append({
+                                "node_id": new_chunk_id,
+                                "parent_id": original_blueprint_node["node_id"],
+                                "tag_name": "wrapper",
+                                "chunk_id": new_chunk_id,
+                                "is_batch": True
+                            })
+                            
+                            batch_num += 1
+                            # The new batch starts with the child that didn't fit.
+                            current_batch = [child]
+
+                    # After the loop, there will be remaining items in current_batch.
+                    # Create one final chunk for them.
+                    if current_batch:
+                        wrapper = ET.Element("wrapper")
+                        wrapper.extend(current_batch)
+                        new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_batch_{batch_num}"
+                        self.chunks[new_chunk_id] = ET.tostring(wrapper, encoding='unicode')
+                        self.blueprint.append({
+                            "node_id": new_chunk_id,
+                            "parent_id": original_blueprint_node["node_id"],
+                            "tag_name": "wrapper",
+                            "chunk_id": new_chunk_id,
+                            "is_batch": True
+                        })
+
+            except ET.ParseError:
+                print(f"Warning: Chunk '{chunk_id}' is too large but could not be parsed for splitting.")
+                continue
+
 
     def _traverse_node(self, element: ET.Element, parent_id: str):
         """
         Traverses every node to build a complete blueprint.
-        It creates chunks ONLY for "terminal complex nodes".
+        It creates chunks ONLY for "chunkable units" as defined by the new logic.
         """
         node_id = f"{element.tag}_{uuid.uuid4().hex[:8]}"
         if self.root_node_id is None:
             self.root_node_id = node_id
 
-        is_terminal = self._is_terminal_complex_node(element)
+        is_chunkable = self._is_chunkable_unit(element)
         
         blueprint_node = {
             "node_id": node_id,
@@ -216,120 +278,40 @@ class XmlToJsonPipeline:
             "chunk_id": None,
         }
 
-        if is_terminal:
-            # This is a unit of work for the ML model. Create a chunk.
+        if is_chunkable:
+            # This is a unit of work. Create a chunk for the entire element.
             chunk_id = f"chunk_{node_id}"
             try:
-                # This modifies the 'element' in-place
+                # Optional: pretty-print the XML for the model
                 ET.indent(element, space="  ")
             except AttributeError:
-                # ET.indent() is not available in Python < 3.9. Silently pass.
-                pass
+                pass # ET.indent() not in Python < 3.9
             self.chunks[chunk_id] = ET.tostring(element, encoding='unicode')
             blueprint_node["chunk_id"] = chunk_id
-            # We add the node to the blueprint, but we DO NOT recurse further,
-            # as the ML model is responsible for processing this entire chunk.
+            # Add the node to the blueprint, but DO NOT recurse. The ML model
+            # handles this entire unit.
         
         self.blueprint.append(blueprint_node)
 
-        if not is_terminal:
+        if not is_chunkable:
             # This is a structural parent. We MUST recurse into its children.
             for child in element:
                 self._traverse_node(child, parent_id=node_id)
 
-    # --- CORRECTED RECONSTRUCTION LOGIC ---
-    # def _reconstruct_from_blueprint(self, ml_results: dict) -> dict:
-    #     """
-    #     Correctly reconstructs the final JSON using a bottom-up assembly
-    #     that respects the "wrapping" nature of complex (hollow) entities.
-    #     """
-    #     # Pass 1: Get the raw, unprocessed content for every node from its ML chunk.
-    #     # This dictionary holds the "starting material" for each node.
-    #     raw_content = {}
-    #     for node_info in self.blueprint:
-    #         node_id = node_info['node_id']
-    #         chunk_id = node_info['chunk_id']
-    #         ml_result = ml_results.get(chunk_id)
 
-    #         content = None
-    #         if ml_result is None:
-    #             content = {"__error__": "ML result missing for chunk", "chunk_id": chunk_id}
-    #         elif isinstance(ml_result, str):
-    #             try:
-    #                 parsed_json = json.loads(ml_result)
-    #                 # The model's output is a dict with one key: the tag name.
-    #                 # We want the inner object.
-    #                 if isinstance(parsed_json, dict) and node_info['tag_name'] in parsed_json:
-    #                     content = parsed_json[node_info['tag_name']]
-    #                 else:
-    #                     content = parsed_json
-    #             except json.JSONDecodeError:
-    #                 content = {"__error__": "Malformed JSON from ML model", "raw_output": ml_result}
-    #         else:
-    #             content = ml_result
-
-    #         raw_content[node_id] = content
-
-    #     # Pass 2: Bottom-up assembly.
-    #     # We iterate through the blueprint in REVERSE. This ensures that by the time
-    #     # we process a parent, all of its children have already been fully assembled.
-    #     final_objects = {}
-        
-    #     # For efficient child lookup, create a map of parent_id -> [child_node_infos]
-    #     children_map = defaultdict(list)
-    #     for node in self.blueprint:
-    #         if node['parent_id']:
-    #             children_map[node['parent_id']].append(node)
-
-    #     for node_info in reversed(self.blueprint):
-    #         node_id = node_info['node_id']
-            
-    #         # Start with the raw content for the current node.
-    #         # This might be a full object (if simple) or just attributes (if complex).
-    #         current_obj = raw_content.get(node_id, {})
-
-    #         # If the node is complex, its children were hollowed out. We need to fill them in.
-    #         if not node_info['is_simple_entity']:
-    #             # Get all children of the current node. We iterate in normal order
-    #             # to preserve the original XML order.
-    #             for child_info in children_map.get(node_id, []):
-    #                 child_id = child_info['node_id']
-    #                 child_tag_name = child_info['tag_name']
-                    
-    #                 # Get the FULLY ASSEMBLED child object from our final_objects workspace.
-    #                 # Because we are iterating in reverse, this is guaranteed to exist.
-    #                 child_final_obj = final_objects.get(child_id)
-
-    #                 # Now, place the complete child object inside the parent object.
-    #                 if child_tag_name in current_obj:
-    #                     if isinstance(current_obj[child_tag_name], list):
-    #                         current_obj[child_tag_name].append(child_final_obj)
-    #                     else:
-    #                         # Convert to list if a key collision happens
-    #                         current_obj[child_tag_name] = [current_obj[child_tag_name], child_final_obj]
-    #                 else:
-    #                     # Check if it should be a list or a single property
-    #                     if len([c for c in children_map.get(node_id, []) if c['tag_name'] == child_tag_name]) > 1:
-    #                         current_obj[child_tag_name] = [child_final_obj]
-    #                     else:
-    #                         current_obj[child_tag_name] = child_final_obj
-            
-    #         # The current_obj is now fully assembled (it has its own content AND its
-    #         # children's fully assembled content). Store it in our final workspace.
-    #         final_objects[node_id] = current_obj
-
-    #     # The final result is the object corresponding to the root node ID.
-    #     root_object = final_objects.get(self.root_node_id, {})
-    #     return {self.blueprint[0]['tag_name']: root_object}
-
-    # --- REFACTORED RECONSTRUCTION LOGIC ---
     def _reconstruct_from_blueprint(self, ml_results: dict) -> dict:
         """
-        Corrected reconstruction. It now correctly handles JSON strings returned
-        from the ML model by parsing them into dictionaries before processing.
+        Final corrected and resilient version.
+        - Catches JSONDecodeError from malformed ML outputs.
+        - Reports the error inline within the final JSON structure.
+        - Assumes ML model returns a wrapped object: {"tag": ...}
+        - Unwraps the object to store only the content in the workspace.
+        - Re-wraps content when assembling the parent.
         """
+        # This dictionary will store the UNWRAPPED CONTENT for each node_id.
         final_objects = {}
         
+        node_map = {n['node_id']: n for n in self.blueprint}
         children_map = defaultdict(list)
         for node in self.blueprint:
             if node['parent_id']:
@@ -338,61 +320,65 @@ class XmlToJsonPipeline:
         for node_info in reversed(self.blueprint):
             node_id = node_info['node_id']
             tag_name = node_info['tag_name']
-            current_obj = None
+            
+            content_obj = {}
 
-            if node_info['chunk_id']:
+            if node_info.get("chunk_id"):
                 chunk_id = node_info['chunk_id']
-                raw_ml_result = ml_results.get(chunk_id)
+                raw_ml_result = ml_results.get(chunk_id, {})
                 
                 parsed_result = None
-                if raw_ml_result is None:
-                    current_obj = {"__error__": "ML result missing for chunk", "chunk_id": chunk_id}
+                # --- START: RESILIENCE FIX ---
+                if isinstance(raw_ml_result, str):
+                    try:
+                        parsed_result = json.loads(raw_ml_result)
+                    except json.JSONDecodeError as e:
+                        # If the JSON is malformed, create an error object instead of crashing.
+                        # This allows the process to continue and reports the error in the output.
+                        print(f"ERROR: Malformed JSON from ML for chunk '{chunk_id}'. Error: {e}")
+                        parsed_result = {
+                            "__error__": "Malformed JSON from ML model",
+                            "raw_output": raw_ml_result
+                        }
                 else:
-                    # This is the critical fix: handle both strings (from real model) and dicts (from simulator)
-                    if isinstance(raw_ml_result, str):
-                        try:
-                            parsed_result = json.loads(raw_ml_result)
-                        except json.JSONDecodeError:
-                            current_obj = {"__error__": "Malformed JSON from ML model", "raw_output": raw_ml_result}
-                    else:
-                        # It's already a Python object (e.g., from the default simulator)
-                        parsed_result = raw_ml_result
+                    # It's already a Python object (from a simulator or other source)
+                    parsed_result = raw_ml_result
+                # --- END: RESILIENCE FIX ---
 
-                # This block only runs if parsing was successful
-                if current_obj is None:
-                    if isinstance(parsed_result, dict) and tag_name in parsed_result:
-                        current_obj = parsed_result[tag_name]
-                    else:
-                        current_obj = {"__error__": "ML result format mismatch or missing tag", "parsed_output": parsed_result}
+                # UNWRAP the result from the model to get the pure content.
+                if isinstance(parsed_result, dict) and tag_name in parsed_result:
+                    content_obj = parsed_result[tag_name]
+                else:
+                    # If it's an error object or in an unexpected format, use it as is.
+                    # This ensures our error report is preserved.
+                    content_obj = parsed_result
             else:
-                # This is a structural-only node. Start with its attributes.
-                # current_obj = node_info['attributes'].copy()
-                current_obj = {f"@{k}": v for k, v in node_info['attributes'].items()}
-
+                # This is a structural node. Build its content from its children.
+                content_obj = {f"@{k}": v for k, v in node_info['attributes'].items()}
                 
-                child_nodes = children_map.get(node_id, [])
-                for child_info in child_nodes:
+                for child_info in children_map.get(node_id, []):
                     child_id = child_info['node_id']
                     child_tag = child_info['tag_name']
-                    child_obj = final_objects.get(child_id)
-
-                    if child_tag in current_obj:
-                        if not isinstance(current_obj[child_tag], list):
-                            current_obj[child_tag] = [current_obj[child_tag]]
-                        current_obj[child_tag].append(child_obj)
+                    
+                    # Get the UNWRAPPED content of the child from our workspace.
+                    child_content = final_objects.get(child_id)
+                    
+                    # Add the child's content to this parent.
+                    if child_tag in content_obj:
+                        if not isinstance(content_obj[child_tag], list):
+                            content_obj[child_tag] = [content_obj[child_tag]]
+                        content_obj[child_tag].append(child_content)
                     else:
-                        is_list = len([c for c in child_nodes if c['tag_name'] == child_tag]) > 1
-                        if is_list:
-                            current_obj[child_tag] = [child_obj]
-                        else:
-                            current_obj[child_tag] = child_obj
+                        is_list = len([c for c in children_map.get(node_id, []) if c['tag_name'] == child_tag]) > 1
+                        content_obj[child_tag] = [child_content] if is_list else child_content
             
-            final_objects[node_id] = current_obj
+            # Store the UNWRAPPED content for this node.
+            final_objects[node_id] = content_obj
 
-        root_object = final_objects.get(self.root_node_id, {})
-        root_tag_name = self.blueprint[0]['tag_name']
-        return {root_tag_name: root_object}
-    
+        # The very last step: get the root's content and wrap it with the root tag.
+        root_content = final_objects.get(self.root_node_id, {})
+        root_tag_name = node_map[self.root_node_id]['tag_name']
+        return {root_tag_name: root_content}
 
     def _is_terminal_complex_node(self, element: ET.Element) -> bool:
         """
@@ -460,89 +446,6 @@ class XmlToJsonPipeline:
                 results[chunk_id] = '{"error": "invalid_xml_chunk"}'
 
         return results
-
-        # Add this method inside the XmlToJsonPipeline class
-
-    # def _reconstruct_from_blueprint(self, ml_results: dict) -> dict:
-    #     """
-    #     Reconstructs the final JSON object by assembling the ML results
-    #     according to the instructions in the blueprint. (Corrected Version)
-
-    #     Args:
-    #         ml_results (dict): The dictionary of {chunk_id: json_output}.
-
-    #     Returns:
-    #         dict: The fully reconstructed JSON object.
-    #     """
-    #     reconstructed_objects = {}
-        
-    #     child_tags_of_parent = defaultdict(lambda: defaultdict(int))
-    #     for node in self.blueprint:
-    #         if node['parent_id']:
-    #             child_tags_of_parent[node['parent_id']][node['tag_name']] += 1
-
-    #     # Pass 1: Create the base object for every node in the blueprint
-    #     # (This pass remains unchanged)
-    #     for node_info in self.blueprint:
-    #         node_id = node_info['node_id']
-    #         chunk_id = node_info['chunk_id']
-    #         ml_result = ml_results.get(chunk_id)
-
-    #         content = None
-    #         if ml_result is None:
-    #             content = {"__error__": "ML result missing for chunk", "chunk_id": chunk_id}
-    #         else:
-    #             if isinstance(ml_result, str):
-    #                 try:
-    #                     ml_result = json.loads(ml_result)
-    #                 except json.JSONDecodeError:
-    #                     content = {"__error__": "Malformed JSON from ML model", "raw_output": ml_result}
-
-    #             if content is None:
-    #                 if node_info['index_in_chunk'] is not None:
-    #                     if isinstance(ml_result, list) and node_info['index_in_chunk'] < len(ml_result):
-    #                         content = ml_result[node_info['index_in_chunk']]
-    #                     else:
-    #                         content = {"__error__": "Index out of bounds in batched result"}
-    #                 else:
-    #                     content = ml_result
-            
-    #         reconstructed_objects[node_id] = content
-
-    #     # Pass 2: Link the objects together into a tree
-    #     final_tree = {}
-    #     for node_info in self.blueprint:
-    #         node_id = node_info['node_id']
-    #         parent_id = node_info['parent_id']
-    #         tag_name = node_info['tag_name']
-
-    #         child_obj = reconstructed_objects.get(node_id, {})
-            
-    #         if parent_id is None:
-    #             final_tree = {tag_name: child_obj}
-    #         else:
-    #             parent_obj = reconstructed_objects.get(parent_id)
-
-    #             # --- THIS IS THE CORRECTED LOGIC ---
-    #             # We can only attach children to a parent that is a dictionary.
-    #             # An error object IS a dictionary, so this check allows attachment.
-    #             if not isinstance(parent_obj, dict):
-    #                 continue # Cannot attach to a non-dict (e.g., list, string, or None)
-
-    #             hint = 'list_item' if child_tags_of_parent[parent_id][tag_name] > 1 else 'property'
-
-    #             if hint == 'list_item':
-    #                 if tag_name not in parent_obj:
-    #                     parent_obj[tag_name] = []
-    #                 if isinstance(parent_obj[tag_name], list):
-    #                     parent_obj[tag_name].append(child_obj)
-    #                 else:
-    #                     parent_obj[tag_name] = [parent_obj[tag_name], child_obj]
-    #             else:
-    #                 parent_obj[tag_name] = child_obj
-                    
-    #     return final_tree
-    
 
 
 # --- Main execution block ---
