@@ -13,7 +13,7 @@ class XmlToJsonPipeline:
     an ML conversion, and then reconstructing the final JSON.
     """
 
-    def __init__(self, inference_function, chunk_token_limit=101):
+    def __init__(self, inference_function, chunk_token_limit=25, child_batch_token_limit=100, attr_batch_token_limit=25):
         """
         Initializes the pipeline.
 
@@ -27,6 +27,8 @@ class XmlToJsonPipeline:
         self.chunks = {}
         self.root_node_id = None
         self.chunk_token_limit = chunk_token_limit
+        self.child_batch_token_limit = child_batch_token_limit
+        self.attr_batch_token_limit = attr_batch_token_limit
         # Initialize the tokenizer once for efficiency
         try:
             self.tokenizer = tiktoken.get_encoding("cl100k_base")
@@ -176,11 +178,12 @@ class XmlToJsonPipeline:
         """
         Second pass after initial chunking. Finds chunks that are too large based on
         a TOKEN LIMIT, then splits them based on whether they are "long" (too many
-        children) or "wide" (too many attributes).
+        children) or "wide" (too many attributes), using specialized thresholds for each.
         """
         original_chunks = list(self.chunks.items())
 
         for chunk_id, xml_string in original_chunks:
+            # The "Gatekeeper" check remains the same
             if self._get_token_count(xml_string) <= self.chunk_token_limit:
                 continue
 
@@ -190,23 +193,18 @@ class XmlToJsonPipeline:
                 root = ET.fromstring(xml_string)
                 children = list(root)
 
-                # Find the original blueprint node that pointed to this chunk
                 original_blueprint_node = next((n for n in self.blueprint if n.get("chunk_id") == chunk_id), None)
                 if not original_blueprint_node:
                     continue
 
-                # --- LOGIC BRANCH: Is the problem LENGTH or WIDTH? ---
-
                 if len(children) > 1:
-                    # --- A) THIS IS A "LONG" ELEMENT (EXISTING LOGIC) ---
-                    print(f"-> Detected 'long' element. Splitting by children...")
+                    # --- A) "LONG" ELEMENT: Use the child batch specialist threshold ---
+                    print(f"-> Detected 'long' element. Splitting by children with limit: {self.child_batch_token_limit}...")
                     
-                    # Remove the original large chunk and its reference in the blueprint
                     del self.chunks[chunk_id]
                     original_blueprint_node["chunk_id"] = None
-                    original_blueprint_node["is_list_container"] = True # Flag for reconstruction
+                    original_blueprint_node["is_list_container"] = True
 
-                    # Iterative, token-aware batching for children
                     current_batch = []
                     batch_num = 0
                     for child in children:
@@ -215,8 +213,10 @@ class XmlToJsonPipeline:
                         temp_wrapper.extend(current_batch)
                         batch_str = ET.tostring(temp_wrapper, encoding='unicode')
 
-                        if self._get_token_count(batch_str) > self.chunk_token_limit and len(current_batch) > 1:
+                        # --- CHANGE: Use the child-specific threshold ---
+                        if self._get_token_count(batch_str) > self.child_batch_token_limit and len(current_batch) > 1:
                             final_batch_elements = current_batch[:-1]
+                            # ... (rest of this block is unchanged)
                             wrapper = ET.Element("wrapper")
                             wrapper.extend(final_batch_elements)
                             new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_child_batch_{batch_num}"
@@ -229,6 +229,7 @@ class XmlToJsonPipeline:
                             current_batch = [child]
 
                     if current_batch:
+                        # ... (this block is unchanged)
                         wrapper = ET.Element("wrapper")
                         wrapper.extend(current_batch)
                         new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_child_batch_{batch_num}"
@@ -239,15 +240,12 @@ class XmlToJsonPipeline:
                         })
 
                 else:
-                    # --- B) THIS IS A "WIDE" ELEMENT (NEW LOGIC) ---
-                    # This branch handles elements with 0 or 1 child that are too large,
-                    # implying the size comes from attributes.
-                    print(f"-> Detected 'wide' element. Splitting by attributes...")
+                    # --- B) "WIDE" ELEMENT: Use the attribute batch specialist threshold ---
+                    print(f"-> Detected 'wide' element. Splitting by attributes with limit: {self.attr_batch_token_limit}...")
 
-                    # Remove the original large chunk and its reference in the blueprint
                     del self.chunks[chunk_id]
                     original_blueprint_node["chunk_id"] = None
-                    original_blueprint_node["is_attribute_container"] = True # New flag for reconstruction
+                    original_blueprint_node["is_attribute_container"] = True
 
                     attributes = list(root.attrib.items())
                     current_batch_attrs = []
@@ -255,30 +253,25 @@ class XmlToJsonPipeline:
 
                     for key, value in attributes:
                         current_batch_attrs.append((key, value))
-                        
-                        # Create a temporary element to measure the token count of the attribute batch
                         temp_element = ET.Element(root.tag, dict(current_batch_attrs))
                         batch_str = ET.tostring(temp_element, encoding='unicode')
 
-                        if self._get_token_count(batch_str) > self.chunk_token_limit and len(current_batch_attrs) > 1:
+                        # --- CHANGE: Use the attribute-specific threshold ---
+                        if self._get_token_count(batch_str) > self.attr_batch_token_limit and len(current_batch_attrs) > 1:
                             final_batch_attrs = current_batch_attrs[:-1]
-                            
-                            # Create a new chunk containing only a subset of attributes
-                            # We use the original tag to preserve context for the model
+                            # ... (rest of this block is unchanged)
                             sub_element = ET.Element(root.tag, dict(final_batch_attrs))
                             new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_attr_batch_{batch_num}"
                             self.chunks[new_chunk_id] = ET.tostring(sub_element, encoding='unicode')
-                            
-                            # Create a blueprint node for this attribute batch
                             self.blueprint.append({
                                 "node_id": new_chunk_id, "parent_id": original_blueprint_node["node_id"],
-                                "tag_name": root.tag, # Use the original tag
-                                "chunk_id": new_chunk_id, "is_attribute_batch": True # New flag
+                                "tag_name": root.tag, "chunk_id": new_chunk_id, "is_attribute_batch": True
                             })
                             batch_num += 1
                             current_batch_attrs = [(key, value)]
 
                     if current_batch_attrs:
+                        # ... (this block is unchanged)
                         sub_element = ET.Element(root.tag, dict(current_batch_attrs))
                         new_chunk_id = f"chunk_{original_blueprint_node['tag_name']}_attr_batch_{batch_num}"
                         self.chunks[new_chunk_id] = ET.tostring(sub_element, encoding='unicode')
@@ -287,11 +280,8 @@ class XmlToJsonPipeline:
                             "tag_name": root.tag, "chunk_id": new_chunk_id, "is_attribute_batch": True
                         })
                     
-                    # IMPORTANT: If the original wide element had one child, we must process it separately.
                     if len(children) == 1:
-                        # We simply recurse on this single child, as it's now an independent unit.
                         self._traverse_node(children[0], parent_id=original_blueprint_node["node_id"])
-
 
             except ET.ParseError:
                 print(f"Warning: Chunk '{chunk_id}' is too large but could not be parsed for splitting.")
