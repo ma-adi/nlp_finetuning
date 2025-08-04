@@ -225,19 +225,6 @@ Train an NLP-based model to convert XML inputs into a specific JSON schema, with
 ```
 ---
 
-## 5. Performance & Cost Comparison
-
-| Metric          | CodeT5+ 220M                        | LLaMA 3.2 3B (GGUF)                  |
-|------------------|--------------------------------------|--------------------------------------|
-| Parameters       | 220 million                         | 3 billion                            |
-| Inference RAM    | ~1.2 GB (FF32, CPU-only)            | ~8 GB (CPU-only)                     |
-| CPU Instance     | `e2-small` (1vCPU / 2GB RAM): $0.0337/hr | `e2-standard-2` (2vCPU / 8GB RAM): $0.067/hr |
-| Recommended RAM  | ≥ 2 GB                              | ≥ 8 GB                               |
-
-> Based on Google Cloud pricing ([cloudprice.net](https://cloudprice.net)) as of July 18, 2025.
-
----
-
 ## ✅ Additional Notes
 
 - **SLM is converted to a CPU-friendly format** that uses relatively fewer resources (e.g., GGUF format).
